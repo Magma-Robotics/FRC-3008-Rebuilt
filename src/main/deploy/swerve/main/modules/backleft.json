@@ -5,8 +5,8 @@
     "canbus": null
   },
   "angle": {
-    "type": "krakenx44",
-    "id": 11,
+    "type": "talonfx",
+    "id": 11, 
     "canbus": null
   },
   "encoder": {
@@ -21,7 +21,7 @@
   "absoluteEncoderInverted": false,
   "absoluteEncoderOffset": 230.80078125,
   "location": {
-    "front": -10.75,
+    "front": -11,
     "left": 11
   }
 }
