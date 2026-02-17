@@ -5,9 +5,11 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
+//import frc.robot.commands.Autos;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+//import frc.robot.subsystems.Intake;
+//import frc.robot.subsystems.Shooter;
 import swervelib.SwerveInputStream;
 
 import java.io.File;
@@ -16,6 +18,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -28,9 +31,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-
   private double slowMultiplier = 1;
   // The robot's subsystems and commands are defined here...
+  //Shooter Shooter = new Shooter();
+  //private final Intake m_intake = new Intake();
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
    private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/main"));
@@ -106,6 +110,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+
   }
 
   /**
@@ -125,18 +130,94 @@ public class RobotContainer {
       .onTrue(Commands.run(() -> slowMultiplier = 0.5))
       .onFalse(Commands.run(() -> slowMultiplier = 1));
 
+   // driverXbox
+      //.leftBumper()
+      //.onTrue(Commands.run(() -> drivebase.setHeadingOffset(Rotation2d.fromDegrees(180))))
+      //.onFalse(Commands.run(() -> drivebase.setHeadingOffset(Rotation2d.fromDegrees(0))));
+    /*
+    //odometry/*
     driverXbox
       .a()
-      .onTrue(resetOdometry()); 
-  }
+      .onTrue(Commands.run(() -> Intake.setFeeder(0.2), Intake))
+      .onFalse(Commands.run(() -> Intake.stopFeeder(),Intake));
+      
+      //.onTrue(resetOdometry());
+      */
+    //intake
+// In RobotContainer.java
+
+/*
+// Button B: Move to 90 degrees and stay there
+driverXbox.b()
+    .onTrue(Commands.runOnce(() -> m_intake.goToDegree(90), m_intake));
+
+// Button A: Move to 180 degrees and stay there
+driverXbox.a()
+    .onTrue(Commands.runOnce(() -> m_intake.goToDegree(180), m_intake));
+
+// Button X: Stop motor power
+driverXbox.x()
+    .onTrue(Commands.runOnce(() -> m_intake.stopIntake(), m_intake));
+
+// Button Y: Return to zero
+driverXbox.y()
+    .onTrue(Commands.runOnce(() -> m_intake.goToDegree(0), m_intake));
+
+driverXbox.povUp()
+    .onTrue(Commands.run(() -> m_intake.setIntake(0.2), m_intake))
+    .onFalse(Commands.run(() -> m_intake.setIntake(0), m_intake));
+
+    /* 
+    driverXbox
+      .x()
+      .onTrue(Commands.run(() -> Intake.setIndexer(0.2), Intake))
+      .onFalse(Commands.run(() -> Intake.stopIndexer(),Intake));
+    driverXbox
+      .y()
+      .onTrue(Commands.run(() -> Intake.setIntakePivot(0.2), Intake))
+      .onFalse(Commands.run(() -> Intake.stopIntakePivot(),Intake));
+    //shootah
+    driverXbox
+      .povUp()
+      .onTrue(Commands.run(() -> Shooter.setTurret(0.2), Shooter))
+      .onFalse(Commands.run(() -> Shooter.stopTurret(),Shooter));    
+    driverXbox
+      .povDown()
+      .onTrue(Commands.run(() -> Shooter.setFlywheel(0.2), Shooter))
+      .onFalse(Commands.run(() -> Shooter.stopFlyWheel(),Shooter));  
+    driverXbox
+      .povLeft()
+      .onTrue(Commands.run(() -> Shooter.setCounterRoller(0.2), Shooter))
+      .onFalse(Commands.run(() -> Shooter.stopCounterRoller(),Shooter));  
+    driverXbox
+      .povRight()
+      .onTrue(Commands.run(() -> Shooter.setHood(0.2), Shooter))
+      .onFalse(Commands.run(() -> Shooter.stopHood(),Shooter)); 
+
+        //Intake.setIntake(0.1); // 
+
+        //Hunter note
+        //runonce: one rotation at set power, run: until controller is off
+        //onTrue: doesn't
+      
+      //driver.a().onTrue(new ExampleCommand()); //#toggle
+    //driverXbox.x().whileTrue(Commands.run(() -> intake.startIntake()));
+      //intake.startIntake(1);  
+    */
+
+      }
+
+  
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
+  //public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
-  }
+    //Intake.setIntake(0.2);
+    
+    //return Autos.exampleAuto(m_exampleSubsystem, Intake);
+  //}
 }

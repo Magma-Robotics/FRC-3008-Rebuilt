@@ -1,88 +1,64 @@
+/*
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.PersistMode;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Intake extends SubsystemBase{
-    private SparkMax intakePivot, indexer;
-    private SparkMaxConfig intakePivotConfig, indexerConfig;
-
+public class Intake extends SubsystemBase {
     private final TalonFX intake;
-
-    private TalonFXConfiguration intakeConfig;
-
-    private RelativeEncoder intakePivotEncoder;
+    private final PositionVoltage m_Request = new PositionVoltage(0);
+    
+    // ADJUST THIS: If your gearbox is 10:1, set this to 10.0. If no gearbox, use 1.0.
+    private final double GEAR_RATIO = 1.0; 
 
     public Intake() {
-        intakePivot = new SparkMax(0, MotorType.kBrushless);
-        indexer = new SparkMax(0, MotorType.kBrushless);
+        intake = new TalonFX(5);
+        TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
 
-        intake = new TalonFX(0);
-
-        intakePivotConfig = new SparkMaxConfig();
-        indexerConfig = new SparkMaxConfig();
-        intakeConfig = new TalonFXConfiguration();
-
-        intakePivotConfig
-            .smartCurrentLimit(20)
-            .inverted(false)
-            .idleMode(IdleMode.kBrake);
-
-        indexerConfig
-            .smartCurrentLimit(20)
-            .inverted(false)
-            .idleMode(IdleMode.kBrake);
+        // PID Gains
+        var slot0Configs=new Slot0Configs();
+        intakeConfig.Slot0.kP = 12.0; 
+        intakeConfig.Slot0.kI = 0.0; // Set to 0 for now to test safely
+        intakeConfig.Slot0.kD = 0.1; 
 
         intakeConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-
-        intakePivotEncoder = intakePivot.getEncoder();
-
-        intakePivot.configure(intakePivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        indexer.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        intake.getConfigurator().apply(intakeConfig);
+        intake.getConfigurator().apply(new TalonFXConfiguration().withSlot0(slot0Configs));
+        
+        // Zero the sensor on boot so "0 degrees" is where the robot starts
+        intake.setPosition(0);
+    }
+    public double getPosition(){
+        return intake.getPosition().getValueAsDouble();
     }
 
-    public void stopIndexer() {
-        indexer.set(0);
+     public void goToDegree(double degrees) {
+        // formula: (Degrees / 360) * Gear Ratio
+        double targetRotations = (degrees / 360.0) * GEAR_RATIO;
+        intake.setControl(positionRequest.withPosition(targetRotations));
     }
-
-    public void stopIntakePivot() {
-        intakePivot.set(0);
-    }
-
+ public void goToPosition() {
+        // formula: (Degrees / 360) * Gear Ratio
+        double targetPosition=5.5;
+        intake.setControl(m_Request.withPosition(targetPosition);
     public void stopIntake() {
-        intake.set(0);
+        // Use duty cycle 0 to stop and let PID release
+        intake.set(0); 
     }
-
-    public void setIndexer(double speed) {
-        indexer.set(speed);
-    }
-
-    public void setIntakePivot(double speed) {
-        intakePivot.set(speed);
-    }
-
     public void setIntake(double speed) {
-        intake.set(speed);
+        intake.set(0.2);
     }
-
-    public double getIntakePivotEncoderPosition() {
-        return intakePivotEncoder.getPosition();
+    @Override
+    public void periodic() {
+        // Check this in Shuffleboard to see if the number changes when you move it by hand
+        SmartDashboard.putNumber("Intake Deg", intake.getPosition().getValueAsDouble() * 360 / GEAR_RATIO);
     }
-
 }
+*/
