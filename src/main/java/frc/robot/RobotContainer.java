@@ -5,10 +5,10 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-//import frc.robot.commands.Autos;
+import frc.robot.commands.Autos;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-//import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Intake;
 //import frc.robot.subsystems.Shooter;
 import swervelib.SwerveInputStream;
 
@@ -34,7 +34,7 @@ public class RobotContainer {
   private double slowMultiplier = 1;
   // The robot's subsystems and commands are defined here...
   //Shooter Shooter = new Shooter();
-  //private final Intake m_intake = new Intake();
+  private final Intake intake = new Intake();
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
    private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/main"));
@@ -146,28 +146,14 @@ public class RobotContainer {
     //intake
 // In RobotContainer.java
 
-/*
+
 // Button B: Move to 90 degrees and stay there
-driverXbox.b()
-    .onTrue(Commands.runOnce(() -> m_intake.goToDegree(90), m_intake));
+    driverXbox
+      .b()
+      .onTrue(Commands.run(() -> intake.setIntake(0.2), intake))
+      .onFalse(Commands.run(() -> intake.stopIntake(),intake));
 
-// Button A: Move to 180 degrees and stay there
-driverXbox.a()
-    .onTrue(Commands.runOnce(() -> m_intake.goToDegree(180), m_intake));
-
-// Button X: Stop motor power
-driverXbox.x()
-    .onTrue(Commands.runOnce(() -> m_intake.stopIntake(), m_intake));
-
-// Button Y: Return to zero
-driverXbox.y()
-    .onTrue(Commands.runOnce(() -> m_intake.goToDegree(0), m_intake));
-
-driverXbox.povUp()
-    .onTrue(Commands.run(() -> m_intake.setIntake(0.2), m_intake))
-    .onFalse(Commands.run(() -> m_intake.setIntake(0), m_intake));
-
-    /* 
+    /*
     driverXbox
       .x()
       .onTrue(Commands.run(() -> Intake.setIndexer(0.2), Intake))
