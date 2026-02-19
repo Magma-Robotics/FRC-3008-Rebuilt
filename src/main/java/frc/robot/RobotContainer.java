@@ -24,6 +24,19 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+//TALON
+import frc.robot.Constants.cTalon;
+import frc.robot.subsystems.Talon;
+import frc.robot.subsystems.Minion;
+
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.revrobotics.spark.SparkMax;
+
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -32,6 +45,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   private double slowMultiplier = 1;
+  private final Talon talon = new Talon();
+  
   // The robot's subsystems and commands are defined here...
   //Shooter Shooter = new Shooter();
   //private final Intake m_intake = new Intake();
@@ -130,6 +145,28 @@ public class RobotContainer {
       .onTrue(Commands.run(() -> slowMultiplier = 0.5))
       .onFalse(Commands.run(() -> slowMultiplier = 1));
 
+    ///////// TALON //////////////
+    //Talon Buttons
+    driverXbox
+    .x()
+    .onTrue(talon.goTalon1())
+    .onFalse(talon.stopTalon());
+
+    driverXbox
+    .y()
+    .onTrue(talon.goTalon2())
+    .onFalse(talon.stopTalon());
+  
+    driverXbox
+    .b()
+    .onTrue(talon.goTalon3())
+    .onFalse(talon.stopTalon());
+
+    driverXbox
+    .a()
+    .onTrue(talon.goTalon4())
+    .onFalse(talon.stopTalon());
+    
    // driverXbox
       //.leftBumper()
       //.onTrue(Commands.run(() -> drivebase.setHeadingOffset(Rotation2d.fromDegrees(180))))
