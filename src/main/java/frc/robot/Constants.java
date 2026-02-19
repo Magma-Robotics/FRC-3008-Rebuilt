@@ -29,7 +29,13 @@ import swervelib.math.Matter;
  */
 public final class Constants
 {
-
+   public static class cTalon {
+    public static final double talon_1 = 0.25;
+    public static final double talon_2=0.5;
+    public static final double talon_3=0.75;
+    public static final double talon_4=1;
+  }
+////////////////////////////// OLD CODE ////////////////////////////////////////////////////////////////
   public static final double ROBOT_MASS = (120) * 0.453592; // 32lbs * kg per pound
   public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.Inches.of(8).in(Meters)), ROBOT_MASS);
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
