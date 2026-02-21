@@ -130,6 +130,10 @@ public class RobotContainer {
       .onTrue(Commands.run(() -> slowMultiplier = 0.5))
       .onFalse(Commands.run(() -> slowMultiplier = 1));
 
+    driverXbox
+      .a()
+      .onTrue(Commands.run(() -> drivebase.zeroGyro()));
+
    // driverXbox
       //.leftBumper()
       //.onTrue(Commands.run(() -> drivebase.setHeadingOffset(Rotation2d.fromDegrees(180))))
