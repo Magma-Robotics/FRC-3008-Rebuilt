@@ -7,8 +7,9 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 //import frc.robot.commands.Autos;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveSubsystem;
-//import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Intake;
 //import frc.robot.subsystems.Shooter;
 import swervelib.SwerveInputStream;
 
@@ -36,11 +37,16 @@ public class RobotContainer {
   //Shooter Shooter = new Shooter();
   //private final Intake m_intake = new Intake();
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+  private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/main"));
+  private final Intake intake = new Intake();
+
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverXbox =
       new CommandXboxController(0);
+      
+  private final CommandXboxController driverXbox2 =
+      new CommandXboxController(1);
 
   public Command resetOdometry() {
     return Commands.run(() -> drivebase.resetOdometry(new Pose2d(new Translation2d(), new Rotation2d())));
@@ -133,6 +139,62 @@ public class RobotContainer {
     driverXbox
       .a()
       .onTrue(Commands.run(() -> drivebase.zeroGyro()));
+
+    //fire driver2
+    driverXbox2 //intakeIN
+      .rightBumper()
+      .onTrue(Commands.run(() -> intake.setIntake(0.2), intake))
+      .onFalse(Commands.run(() -> intake.stopIntake(), intake));
+    driverXbox2 //intakeOUT
+    .leftBumper()
+    .onTrue(Commands.run(() -> intake.setIntake(-0.2), intake)) //this better work -0.2
+    .onFalse(Commands.run(() -> intake.stopIntake(), intake));
+
+    driverXbox2 //slowspeed fire
+      .x()
+      .onTrue(Commands.run(() -> intake.setflyWheel11(), intake)
+      .onFalse(Commands.run(() -> intake.stopflyWheel(), intake));
+    driverXbox2 //fastspeed fire
+      .y()
+      .onTrue(Commands.run(() -> intake.setflyWheel22(), intake))
+      .onFalse(Commands.run(() -> intake.stopflyWheel(), intake));
+    //intake pivot
+    driverXbox2 //pivot up
+      .povUp()
+      .onTrue(Commands.run(() -> intake.setPivot(0.5), intake))
+      .onFalse(Commands.run(() -> intake.stopPivot(), intake));
+    driverXbox2 //pivot down
+      .povDown()
+      .onTrue(Commands.run(() -> intake.setPivot(-0.5), intake))
+      .onFalse(Commands.run(() -> intake.stopPivot(), intake));
+    //indexer
+    driverXbox2//indexer forward
+      .povLeft()
+      .onTrue(Commands.run(() -> intake.setIndexer(0.5), intake))
+      .onFalse(Commands.run(() -> intake.stopIndexing(), intake));
+    driverXbox2//indexer reverse
+      .povRight()
+      .onTrue(Commands.run(() -> intake.setIndexer(-0.5), intake))
+      .onFalse(Commands.run(() -> intake.stopIndexing(), intake));
+    //feeder
+    driverXbox2//feeder forward
+      .a()
+      .onTrue(Commands.run(() -> intake.setFeeder(0.5), intake))
+      .onFalse(Commands.run(() -> intake.stopFeeding(), intake));
+    driverXbox2//feeder reverse
+      .b()
+      .onTrue(Commands.run(() -> intake.setFeeder(-0.5), intake))
+      .onFalse(Commands.run(() -> intake.stopFeeding(), intake));
+
+    driverXbox2//turret right
+      .rightStick()
+      .onTrue(Commands.run(() -> intake.setTurret(0.2), intake))
+      .onFalse(Commands.run(() -> intake.stopTurret(), intake));
+    driverXbox2//turret left
+      .leftStick()
+      .onTrue(Commands.run(() -> intake.setTurret(-0.2), intake))
+      .onFalse(Commands.run(() -> intake.stopTurret(), intake));
+
 
    // driverXbox
       //.leftBumper()
