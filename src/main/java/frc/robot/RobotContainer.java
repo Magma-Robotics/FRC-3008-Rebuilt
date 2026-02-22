@@ -152,7 +152,7 @@ public class RobotContainer {
 
     driverXbox2 //slowspeed fire
       .x()
-      .onTrue(Commands.run(() -> intake.setflyWheel11(), intake)
+      .onTrue(Commands.run(() -> intake.setflyWheel11(), intake))
       .onFalse(Commands.run(() -> intake.stopflyWheel(), intake));
     driverXbox2 //fastspeed fire
       .y()

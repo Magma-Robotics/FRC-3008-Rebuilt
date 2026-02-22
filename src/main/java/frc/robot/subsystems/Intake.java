@@ -20,16 +20,16 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase{
-    private SparkMax feeder, counterRoller, indexer;
+    private SparkMax counterRoller, indexer;
     private SparkFlex intakePivot;
 
     private SparkFlexConfig intakePivotConfig;
-    private SparkMaxConfig feederConfig, counterRollerConfig, indexerConfig;
+    private SparkMaxConfig counterRollerConfig, indexerConfig;
 
-    private final TalonFX intake, flyWheel1, flyWheel2, turret;
+    private final TalonFX intake, flyWheel1, flyWheel2, turret, feeder;
     private final VelocityVoltage velocityRequest2, velocityRequest1;
 
-    private TalonFXConfiguration intakeConfig, flyWheel1Config, flyWheel2Config, turretConfig;
+    private TalonFXConfiguration intakeConfig, flyWheel1Config, flyWheel2Config, turretConfig, feederConfig;
 
     //private RelativeEncoder intakePivotEncoder;
 
@@ -43,14 +43,14 @@ public class Intake extends SubsystemBase{
         turret = new TalonFX(26); //change me tmr
         //Minions
         counterRoller = new SparkMax(23, MotorType.kBrushless); //22 = hood
-        feeder = new SparkMax(21, MotorType.kBrushless);
+        feeder = new TalonFX(21);
         indexer = new SparkMax(5, MotorType.kBrushless); //21 = feeder
 
         intakeConfig = new TalonFXConfiguration();
         flyWheel2Config = new TalonFXConfiguration();
         flyWheel1Config = new TalonFXConfiguration();
         turretConfig = new TalonFXConfiguration();
-        feederConfig = new SparkMaxConfig();    
+        feederConfig = new TalonFXConfiguration();   
         counterRollerConfig = new SparkMaxConfig();  
         indexerConfig = new SparkMaxConfig(); 
 
@@ -83,10 +83,6 @@ public class Intake extends SubsystemBase{
          //   .inverted(false)
          //   .idleMode(IdleMode.kCoast);
 
-        feederConfig
-            .smartCurrentLimit(20)
-            .inverted(true)
-            .idleMode(IdleMode.kCoast);
         counterRollerConfig
             .smartCurrentLimit(20)
             .inverted(false)
@@ -104,10 +100,13 @@ public class Intake extends SubsystemBase{
             .inverted(false)
             .idleMode(IdleMode.kBrake);
 
-        intakeConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        intakeConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-         flyWheel1Config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        feederConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        feederConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+        flyWheel1Config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         flyWheel1Config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
         flyWheel2Config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -116,6 +115,8 @@ public class Intake extends SubsystemBase{
         turretConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         turretConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
+        
+
 
 
         //intakePivotEncoder = intakePivot.getEncoder();
@@ -123,7 +124,7 @@ public class Intake extends SubsystemBase{
         //intakePivot.configure(intakePivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
        // indexer.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         counterRoller.configure(counterRollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        feeder.configure(feederConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        feeder.getConfigurator().apply(feederConfig);
         intake.getConfigurator().apply(intakeConfig);
         flyWheel1.getConfigurator().apply(flyWheel1Config);
         flyWheel2.getConfigurator().apply(flyWheel2Config);
@@ -150,7 +151,7 @@ public class Intake extends SubsystemBase{
         flyWheel2.setControl(velocityRequest2);
     }
      public void setFeeder(double speed) {
-        feeder.set(speed);
+        feeder.set(-speed);
         counterRoller.set(speed);
 
     }
