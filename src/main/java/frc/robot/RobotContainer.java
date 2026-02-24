@@ -140,51 +140,57 @@ public class RobotContainer {
       .a()
       .onTrue(Commands.run(() -> drivebase.zeroGyro()));
 
-    //fire driver2
+    // ROD DRIVING CONTROLS
     driverXbox2 //intakeIN
       .rightBumper()
       .onTrue(Commands.run(() -> intake.setIntake(0.2), intake))
       .onFalse(Commands.run(() -> intake.stopIntake(), intake));
+      
     driverXbox2 //intakeOUT
-    .leftBumper()
-    .onTrue(Commands.run(() -> intake.setIntake(-0.2), intake)) //this better work -0.2
-    .onFalse(Commands.run(() -> intake.stopIntake(), intake));
+      .leftBumper()
+      .onTrue(Commands.run(() -> intake.setIntake(-0.2), intake)) //this better work -0.2
+      .onFalse(Commands.run(() -> intake.stopIntake(), intake));
 
-    driverXbox2 //slowspeed fire
-      .x()
-      .onTrue(Commands.run(() -> intake.setflyWheel11(), intake))
-      .onFalse(Commands.run(() -> intake.stopflyWheel(), intake));
-    driverXbox2 //fastspeed fire
-      .y()
-      .onTrue(Commands.run(() -> intake.setflyWheel22(), intake))
-      .onFalse(Commands.run(() -> intake.stopflyWheel(), intake));
-    //intake pivot
-    driverXbox2 //pivot up
-      .povUp()
-      .onTrue(Commands.run(() -> intake.setPivot(0.5), intake))
-      .onFalse(Commands.run(() -> intake.stopPivot(), intake));
-    driverXbox2 //pivot down
-      .povDown()
-      .onTrue(Commands.run(() -> intake.setPivot(-0.5), intake))
-      .onFalse(Commands.run(() -> intake.stopPivot(), intake));
-    //indexer
-    driverXbox2//indexer forward
-      .povLeft()
+    driverXbox2//indexer IN
+      .rightTrigger()
       .onTrue(Commands.run(() -> intake.setIndexer(0.5), intake))
       .onFalse(Commands.run(() -> intake.stopIndexing(), intake));
-    driverXbox2//indexer reverse
-      .povRight()
+
+    driverXbox2//indexer OUT
+      .leftTrigger()
       .onTrue(Commands.run(() -> intake.setIndexer(-0.5), intake))
       .onFalse(Commands.run(() -> intake.stopIndexing(), intake));
-    //feeder
-    driverXbox2//feeder forward
+
+    driverXbox2 //slowspeed fire
+      .povDown()
+      .onTrue(Commands.run(() -> intake.setflyWheel11(), intake))
+      .onFalse(Commands.run(() -> intake.stopflyWheel(), intake));
+    
+    driverXbox2 //fastspeed fire
+      .povUp()
+      .onTrue(Commands.run(() -> intake.setflyWheel22(), intake))
+      .onFalse(Commands.run(() -> intake.stopflyWheel(), intake));
+    
+    driverXbox2 //feeder forward
       .a()
       .onTrue(Commands.run(() -> intake.setFeeder(0.5), intake))
       .onFalse(Commands.run(() -> intake.stopFeeding(), intake));
-    driverXbox2//feeder reverse
+
+    driverXbox2 //feeder reverse
       .b()
       .onTrue(Commands.run(() -> intake.setFeeder(-0.5), intake))
       .onFalse(Commands.run(() -> intake.stopFeeding(), intake));
+
+
+    driverXbox2 //pivot extend
+      .y()
+      .onTrue(Commands.run(() -> intake.setPivot(0.5), intake))
+      .onFalse(Commands.run(() -> intake.stopPivot(), intake));
+      
+    driverXbox2 //pivot retract
+      .x()
+      .onTrue(Commands.run(() -> intake.setPivot(-0.5), intake))
+      .onFalse(Commands.run(() -> intake.stopPivot(), intake));
 
     driverXbox2//turret right
       .rightStick()
