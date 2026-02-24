@@ -140,14 +140,24 @@ public class RobotContainer {
       .a()
       .onTrue(Commands.run(() -> drivebase.zeroGyro()));
 
+    driverXbox //liftDown
+      .povDown()
+      .onTrue(Commands.run(() -> intake.setLift(-1), intake))
+      .onFalse(Commands.run(() -> intake.stopLift(), intake));
+
+    driverXbox //liftUp
+      .povUp()
+      .onTrue(Commands.run(() -> intake.setLift(1), intake))
+      .onFalse(Commands.run(() -> intake.stopLift(), intake));
+
     // ROD DRIVING CONTROLS
     driverXbox2 //intakeIN
-      .rightBumper()
+      .leftBumper()
       .onTrue(Commands.run(() -> intake.setIntake(0.2), intake))
       .onFalse(Commands.run(() -> intake.stopIntake(), intake));
       
     driverXbox2 //intakeOUT
-      .leftBumper()
+      .rightBumper()
       .onTrue(Commands.run(() -> intake.setIntake(-0.2), intake)) //this better work -0.2
       .onFalse(Commands.run(() -> intake.stopIntake(), intake));
 
@@ -194,11 +204,11 @@ public class RobotContainer {
 
     driverXbox2//turret right
       .rightStick()
-      .onTrue(Commands.run(() -> intake.setTurret(0.2), intake))
+      .onTrue(Commands.run(() -> intake.setTurret(0.1), intake))
       .onFalse(Commands.run(() -> intake.stopTurret(), intake));
     driverXbox2//turret left
       .leftStick()
-      .onTrue(Commands.run(() -> intake.setTurret(-0.2), intake))
+      .onTrue(Commands.run(() -> intake.setTurret(-0.1), intake))
       .onFalse(Commands.run(() -> intake.stopTurret(), intake));
 
 

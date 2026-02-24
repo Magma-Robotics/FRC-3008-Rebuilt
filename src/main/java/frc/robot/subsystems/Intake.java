@@ -21,9 +21,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase{
     private SparkMax counterRoller, indexer;
-    private SparkFlex intakePivot;
+    private SparkFlex intakePivot, lift;
 
-    private SparkFlexConfig intakePivotConfig;
+    private SparkFlexConfig intakePivotConfig, liftConfig;
     private SparkMaxConfig counterRollerConfig, indexerConfig;
 
     private final TalonFX intake, flyWheel1, flyWheel2, turret, feeder;
@@ -36,11 +36,12 @@ public class Intake extends SubsystemBase{
     public Intake() {
         //change CAN IDs
         intakePivot = new SparkFlex(16, MotorType.kBrushless);
+        lift = new SparkFlex(17, MotorType.kBrushless); //lift
         //indexer = new SparkMax(5, MotorType.kBrushless);
         intake = new TalonFX(24);
         flyWheel1 = new TalonFX(1);
         flyWheel2 = new TalonFX(0);
-        turret = new TalonFX(26); //change me tmr
+        turret = new TalonFX(20); //change me tmr
         //Minions
         counterRoller = new SparkMax(23, MotorType.kBrushless); //22 = hood
         feeder = new TalonFX(21);
@@ -55,11 +56,12 @@ public class Intake extends SubsystemBase{
         indexerConfig = new SparkMaxConfig(); 
 
         intakePivotConfig = new SparkFlexConfig();
+        liftConfig = new SparkFlexConfig();
 
 
         
         VelocityVoltage velocityRequest = new VelocityVoltage(50);
-        velocityRequest2 = new VelocityVoltage(100);
+        velocityRequest2 = new VelocityVoltage(80);
         velocityRequest1 = new VelocityVoltage(50);
 
         var slot0 = flyWheel1Config.Slot0;
@@ -162,7 +164,9 @@ public class Intake extends SubsystemBase{
     public void setPivot(double speed) {
         intakePivot.set(speed);
     }
-    
+    public void setLift(double speed) {
+        lift.set(speed);
+    }
     //stop functions
     public void stopTurret() {
         turret.set(0);
@@ -183,6 +187,9 @@ public class Intake extends SubsystemBase{
     }
     public void stopPivot() {
         intakePivot.set(0);
+    }
+    public void stopLift() {
+        lift.set(0);
     }
     //public double getIntakePivotEncoderPosition() {
     //    return intakePivotEncoder.getPosition();
