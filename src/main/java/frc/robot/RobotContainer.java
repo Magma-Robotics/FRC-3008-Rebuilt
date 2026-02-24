@@ -153,12 +153,12 @@ public class RobotContainer {
     // ROD DRIVING CONTROLS
     driverXbox2 //intakeIN
       .leftBumper()
-      .onTrue(Commands.run(() -> intake.setIntake(0.2), intake))
+      .onTrue(Commands.run(() -> intake.setIntake(0.4), intake))
       .onFalse(Commands.run(() -> intake.stopIntake(), intake));
       
     driverXbox2 //intakeOUT
       .rightBumper()
-      .onTrue(Commands.run(() -> intake.setIntake(-0.2), intake)) //this better work -0.2
+      .onTrue(Commands.run(() -> intake.setIntake(-0.4), intake)) //this better work -0.2
       .onFalse(Commands.run(() -> intake.stopIntake(), intake));
 
     driverXbox2//indexer IN
@@ -183,14 +183,13 @@ public class RobotContainer {
     
     driverXbox2 //feeder forward
       .a()
-      .onTrue(Commands.run(() -> intake.setFeeder(0.5), intake))
+      .onTrue(Commands.run(() -> intake.setFeeder(0.7), intake))
       .onFalse(Commands.run(() -> intake.stopFeeding(), intake));
 
     driverXbox2 //feeder reverse
       .b()
-      .onTrue(Commands.run(() -> intake.setFeeder(-0.5), intake))
+      .onTrue(Commands.run(() -> intake.setFeeder(-0.7), intake))
       .onFalse(Commands.run(() -> intake.stopFeeding(), intake));
-
 
     driverXbox2 //pivot extend
       .y()
@@ -202,15 +201,16 @@ public class RobotContainer {
       .onTrue(Commands.run(() -> intake.setPivot(-0.5), intake))
       .onFalse(Commands.run(() -> intake.stopPivot(), intake));
 
-    driverXbox2//turret right
+    driverXbox //turret right
       .rightStick()
       .onTrue(Commands.run(() -> intake.setTurret(0.1), intake))
       .onFalse(Commands.run(() -> intake.stopTurret(), intake));
-    driverXbox2//turret left
-      .leftStick()
-      .onTrue(Commands.run(() -> intake.setTurret(-0.1), intake))
-      .onFalse(Commands.run(() -> intake.stopTurret(), intake));
 
+
+    driverXbox //turret right
+      .leftStick()
+      .onTrue(Commands.run(() -> intake.setTurret(-0.1), intake))   
+      .onFalse(Commands.run(() -> intake.stopTurret(), intake));
 
    // driverXbox
       //.leftBumper()

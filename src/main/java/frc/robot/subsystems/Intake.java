@@ -12,7 +12,6 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -42,6 +41,7 @@ public class Intake extends SubsystemBase{
         flyWheel1 = new TalonFX(1);
         flyWheel2 = new TalonFX(0);
         turret = new TalonFX(20); //change me tmr
+        
         //Minions
         counterRoller = new SparkMax(23, MotorType.kBrushless); //22 = hood
         feeder = new TalonFX(21);
@@ -136,7 +136,22 @@ public class Intake extends SubsystemBase{
     //functions??
     //turn-on
     public void setTurret(double speed) {
+        if(speed > 0){
+            if(turret.getPosition().getValueAsDouble() >= 3.999) {
+                turret.set(0);
+                return;
+            }
+        }
+
+        if(speed < 0){
+            if(turret.getPosition().getValueAsDouble() <= -4.585) {
+                turret.set(0);
+                return;
+            }
+        }
+
         turret.set(speed);
+        
     }
     
     public void setIntake(double speed) {
