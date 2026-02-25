@@ -7,9 +7,11 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.sim.TalonFXSimState.MotorType;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.ColorSensorV3.MainControl;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkFlexConfig;
@@ -34,8 +36,8 @@ public class Intake extends SubsystemBase{
 
     public Intake() {
         //change CAN IDs
-        intakePivot = new SparkFlex(16, MotorType.kBrushless);
-        lift = new SparkFlex(17, MotorType.kBrushless); //lift
+        intakePivot = new SparkFlex(16, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); //intake pivot
+        lift = new SparkFlex(17, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); //lift
         //indexer = new SparkMax(5, MotorType.kBrushless);
         intake = new TalonFX(24);
         flyWheel1 = new TalonFX(1);
@@ -43,9 +45,9 @@ public class Intake extends SubsystemBase{
         turret = new TalonFX(20); //change me tmr
         
         //Minions
-        counterRoller = new SparkMax(23, MotorType.kBrushless); //22 = hood
+        counterRoller = new SparkMax(23, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); //22 = hood
         feeder = new TalonFX(21);
-        indexer = new SparkMax(5, MotorType.kBrushless); //21 = feeder
+        indexer = new SparkMax(5, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); //21 = feeder
 
         intakeConfig = new TalonFXConfiguration();
         flyWheel2Config = new TalonFXConfiguration();
