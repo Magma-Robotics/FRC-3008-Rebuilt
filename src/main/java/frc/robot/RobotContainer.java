@@ -138,7 +138,7 @@ public class RobotContainer {
 
     driverXbox
       .a()
-      .onTrue(Commands.run(() -> drivebase.zeroGyro()));
+      .onTrue(Commands.runOnce(() -> drivebase.zeroGyro()));
 
     driverXbox //liftDown
       .povDown()
@@ -202,15 +202,14 @@ public class RobotContainer {
       .onFalse(Commands.run(() -> intake.stopPivot(), intake));
 
     driverXbox //turret right
-      .rightStick()
-      .onTrue(Commands.run(() -> intake.setTurret(0.1), intake))
-      .onFalse(Commands.run(() -> intake.stopTurret(), intake));
-
+      .rightBumper()
+      .onTrue(Commands.run(() -> intake.setTurretR(0.1), intake))
+      .onFalse(Commands.runOnce(() -> intake.stopTurret(), intake));
 
     driverXbox //turret right
-      .leftStick()
-      .onTrue(Commands.run(() -> intake.setTurret(-0.1), intake))   
-      .onFalse(Commands.run(() -> intake.stopTurret(), intake));
+      .leftBumper()
+      .onTrue(Commands.run(() -> intake.setTurretL(-0.1), intake))   
+      .onFalse(Commands.runOnce(() -> intake.stopTurret(), intake));
 
    // driverXbox
       //.leftBumper()

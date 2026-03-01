@@ -137,7 +137,7 @@ public class Intake extends SubsystemBase{
     }
     //functions??
     //turn-on
-    public void setTurret(double speed) {
+    public void setTurretR(double speed) {
         if(speed > 0){
             if(turret.getPosition().getValueAsDouble() >= 3.999) {
                 turret.set(0);
@@ -153,9 +153,26 @@ public class Intake extends SubsystemBase{
         }
 
         turret.set(speed);
-        
     }
     
+    public void setTurretL(double speed) {
+        if(speed > 0){
+            if(turret.getPosition().getValueAsDouble() >= 3.999) {
+                turret.set(0);
+                return;
+            }
+        }
+
+        if(speed < 0){
+            if(turret.getPosition().getValueAsDouble() <= -4.585) {
+                turret.set(0);
+                return;
+            }
+        }
+
+        turret.set(speed);
+    }
+
     public void setIntake(double speed) {
         intake.set(speed);
     }
@@ -165,15 +182,17 @@ public class Intake extends SubsystemBase{
         flyWheel2.setControl(velocityRequest1);
     }
 
-        public void setflyWheel22() {
+    public void setflyWheel22() {
         flyWheel1.setControl(velocityRequest2);
         flyWheel2.setControl(velocityRequest2);
     }
+
      public void setFeeder(double speed) {
         feeder.set(-speed);
         counterRoller.set(speed);
 
     }
+    
      public void setIndexer(double speed) {
      indexer.set(speed);
     }
