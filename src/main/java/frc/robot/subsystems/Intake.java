@@ -227,6 +227,12 @@ public class Intake extends SubsystemBase{
     public void stopLift() {
         lift.set(0);
     }
+
+    public void setFlywheelZero(double speed) {
+        flyWheel1.set(speed);
+        flyWheel2.set(speed);
+    }
+
     //public double getIntakePivotEncoderPosition() {
     //    return intakePivotEncoder.getPosition();
     //}

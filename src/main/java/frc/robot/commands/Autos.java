@@ -13,10 +13,16 @@ public final class Autos {
     return Commands.sequence(
         Commands.runOnce(() -> {
           intake.setflyWheel22();
+          WaitCommand wait = new WaitCommand(3);
+          Commands.waitUntil(() -> wait.isFinished());    
           intake.setIndexer(0.5);
           intake.setFeeder(0.7);
-          WaitCommand wait = new WaitCommand(19);
-          Commands.waitUntil(() -> wait.isFinished());
+          WaitCommand wait2 = new WaitCommand(16);
+          Commands.waitUntil(() -> wait2.isFinished());
+          
+          intake.setIndexer(0);
+          intake.setFeeder(0);
+          intake.setFlywheelZero(0);
           // intake.setSpeed(double) is not defined on Intake; implement Intake.setSpeed(double)
           // or replace this with the appropriate existing Intake method.
         }),
