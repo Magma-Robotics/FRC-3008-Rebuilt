@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import org.opencv.core.Mat;
+
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -158,14 +160,14 @@ public class Intake extends SubsystemBase{
     public void setTurretL(double speed) {
         if(speed > 0){
             if(turret.getPosition().getValueAsDouble() >= 3.999) {
-                turret.set(0);
+                turret.set(Math.abs(0));
                 return;
             }
         }
 
         if(speed < 0){
             if(turret.getPosition().getValueAsDouble() <= -4.585) {
-                turret.set(0);
+                turret.set(Math.abs(0));
                 return;
             }
         }
@@ -189,7 +191,7 @@ public class Intake extends SubsystemBase{
     }
 
     public void setIntake(double speed) {
-        intake.set(speed);
+        intake.set(Math.abs(speed));
     }
 
     public void setflyWheel11() {
@@ -203,49 +205,49 @@ public class Intake extends SubsystemBase{
     }
 
      public void setFeeder(double speed) {
-        feeder.set(-speed);
-        counterRoller.set(speed);
+        feeder.set(-Math.abs(speed));
+        counterRoller.set(Math.abs(speed));
 
     }
     
      public void setIndexer(double speed) {
-     indexer.set(speed);
+     indexer.set(Math.abs(speed));
     }
 
     public void setPivot(double speed) {
-        intakePivot.set(speed);
+        intakePivot.set(Math.abs(speed));
     }
     public void setLift(double speed) {
-        lift.set(speed);
+        lift.set(Math.abs(speed));
     }
     //stop functions
     public void stopTurret() {
-        turret.set(0);
+        turret.set(Math.abs(0));
     }
     public void stopIntake() {
-        intake.set(0);
+        intake.set(Math.abs(0));
     }
     public void stopflyWheel() {
-        flyWheel1.set(0);
-        flyWheel2.set(0);
+        flyWheel1.set(Math.abs(0));
+        flyWheel2.set(Math.abs(0));
     }
     public void stopFeeding() {
-        feeder.set(0);
-        counterRoller.set(0);
+        feeder.set(Math.abs(0));
+        counterRoller.set(Math.abs(0));
     }
     public void stopIndexing() {
-        indexer.set(0);
+        indexer.set(Math.abs(0));
     }
     public void stopPivot() {
-        intakePivot.set(0);
+        intakePivot.set(Math.abs(0));
     }
     public void stopLift() {
-        lift.set(0);
+        lift.set(Math.abs(0));
     }
 
     public void setFlywheelZero(double speed) {
-        flyWheel1.set(speed);
-        flyWheel2.set(speed);
+        flyWheel1.set(Math.abs(speed));
+        flyWheel2.set(Math.abs(speed));
     }
 
     //public double getIntakePivotEncoderPosition() {

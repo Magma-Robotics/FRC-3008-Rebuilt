@@ -9,40 +9,44 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 public final class Autos {
   private final Intake intake;
   public static Command exampleAuto(ExampleSubsystem subsystem, Intake intake) {
-    // Set intake during autonomous as needed; replace the lambda body with the actual intake call when available
+    // Build an actual command sequence (do not create commands inside a runOnce lambda)
     return Commands.sequence(
+        // Turn turret to the right for 0.75s
+        Commands.runOnce(() -> intake.setTurretR(0.2), intake),
+        new WaitCommand(0.75),
+
+        // Stop turret
+        Commands.runOnce(() -> intake.setTurretR(0.0), intake),
+
+        // Spin up flywheel and wait
+        Commands.runOnce(() -> intake.setflyWheel22(), intake),
+        new WaitCommand(3),
+
+        // Start indexing/feeding
         Commands.runOnce(() -> {
-          intake.setTurretR(0.2); //Turret Turning
-          WaitCommand waita = new WaitCommand(0.75); // wait a - turret facing to the shooter manually
-          Commands.waitUntil(() -> waita.isFinished());
-          intake.setTurretR(0);
-
-          intake.setflyWheel22();   // Flywheel Setup
-          WaitCommand waitb = new WaitCommand(3);   // wait b - setting and reving up the motors to start to shoot
-          Commands.waitUntil(() -> waitb.isFinished());    
-          intake.setIndexer(0.5);  // Indexer misc settings
+          intake.setIndexer(0.5);
           intake.setFeeder(0.7);
+        }, intake),
 
-          WaitCommand waitc = new WaitCommand(14);     // wait c - waiting for all of the balls to be finished shoorting
-          Commands.waitUntil(() -> waitc.isFinished());
+        // Wait while shooting
+        new WaitCommand(14),
 
-          // intake.setTurretL(0.2); //Turret Turning
-          // WaitCommand waitd = new WaitCommand(0.75);    // wait d - turning the turret to its original face to consider for the init for the teleop
-          // Commands.waitUntil(() -> waitd.isFinished());
-          // intake.setTurretL(0);
+        // Return turret to origin (runs until position reached), then stop turret
+        Commands.run(() -> intake.setTurretToOrigin(0.1), intake)
+            .until(() -> Math.abs(intake.getTurretPosition()) <= 0.01)
+            .andThen(Commands.runOnce(intake::stopTurret, intake)),
 
-          Commands.run(() -> intake.setTurretToOrigin(0.1), intake)
-              .until(() -> Math.abs(intake.getTurretPosition()) <= 0.01)
-              .andThen(Commands.runOnce(() -> intake.stopTurret(), intake));
-          
-          intake.setIndexer(0); // turn off everything for the teleop init to avoid system break
+        // Ensure everything is off
+        Commands.runOnce(() -> {
+          intake.setIndexer(0);
           intake.setFeeder(0);
           intake.setFlywheelZero(0);
-          // intake.setSpeed(double) is not defined on Intake; implement Intake.setSpeed(double)
-          // or replace this with the appropriate existing Intake method.
-        }),
+        }, intake),
+
+        // keep the existing example method command if you want it included
         subsystem.exampleMethodCommand(),
-        Commands.none());
+        Commands.none()
+    );
   }
 
   private Autos() {
