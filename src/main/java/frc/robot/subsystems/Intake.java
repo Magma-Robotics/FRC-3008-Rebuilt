@@ -23,14 +23,14 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase{
-    private SparkMax counterRoller, indexer;
+    private SparkMax counterRoller, indexer, hood;
     private SparkFlex intakePivot, lift;
 
     private SparkFlexConfig intakePivotConfig, liftConfig;
-    private SparkMaxConfig counterRollerConfig, indexerConfig;
+    private SparkMaxConfig counterRollerConfig, indexerConfig, hoodConfig;
 
     private final TalonFX intake, flyWheel1, flyWheel2, turret, feeder;
-    private final VelocityVoltage velocityRequest2, velocityRequest1;
+    private final VelocityVoltage velocityRequest2, velocityRequest1, velocityRequest3;
 
     private TalonFXConfiguration intakeConfig, flyWheel1Config, flyWheel2Config, turretConfig, feederConfig;
 
@@ -48,6 +48,7 @@ public class Intake extends SubsystemBase{
         
         //Minions
         counterRoller = new SparkMax(23, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); //22 = hood
+        hood = new SparkMax(22, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); //22 = hood
         feeder = new TalonFX(21);
         indexer = new SparkMax(5, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); //21 = feeder
 
@@ -56,7 +57,8 @@ public class Intake extends SubsystemBase{
         flyWheel1Config = new TalonFXConfiguration();
         turretConfig = new TalonFXConfiguration();
         feederConfig = new TalonFXConfiguration();   
-        counterRollerConfig = new SparkMaxConfig();  
+        counterRollerConfig = new SparkMaxConfig(); 
+        hoodConfig = new SparkMaxConfig(); 
         indexerConfig = new SparkMaxConfig(); 
 
         intakePivotConfig = new SparkFlexConfig();
@@ -67,6 +69,7 @@ public class Intake extends SubsystemBase{
         VelocityVoltage velocityRequest = new VelocityVoltage(50);
         velocityRequest2 = new VelocityVoltage(80);
         velocityRequest1 = new VelocityVoltage(50);
+        velocityRequest3 = new VelocityVoltage(67);
 
         var slot0 = flyWheel1Config.Slot0;
         slot0.kP = 0.12;  // Proportional gain
@@ -160,19 +163,27 @@ public class Intake extends SubsystemBase{
     public void setTurretL(double speed) {
         if(speed > 0){
             if(turret.getPosition().getValueAsDouble() >= 3.999) {
-                turret.set(Math.abs(0));
+                turret.set(0);
                 return;
             }
         }
 
         if(speed < 0){
             if(turret.getPosition().getValueAsDouble() <= -4.585) {
-                turret.set(Math.abs(0));
+                turret.set(0);
                 return;
             }
         }
 
         turret.set(speed);
+    }
+
+    public void hoodUp(double speed) {
+        hood.set(Math.abs(speed));
+    }
+
+    public void hoodDown(double speed) {
+        hood.set(-Math.abs(speed));
     }
 
     public void setTurretToOrigin(double speed) {
@@ -191,7 +202,7 @@ public class Intake extends SubsystemBase{
     }
 
     public void setIntake(double speed) {
-        intake.set(Math.abs(speed));
+        intake.set(speed);
     }
 
     public void setflyWheel11() {
@@ -204,21 +215,26 @@ public class Intake extends SubsystemBase{
         flyWheel2.setControl(velocityRequest2);
     }
 
+    public void setflyWheel33() {
+        flyWheel1.setControl(velocityRequest3);
+        flyWheel2.setControl(velocityRequest3);
+    }
+
      public void setFeeder(double speed) {
-        feeder.set(-Math.abs(speed));
-        counterRoller.set(Math.abs(speed));
+        feeder.set(Math.abs(speed));
+        counterRoller.set(-Math.abs(speed));
 
     }
     
      public void setIndexer(double speed) {
-     indexer.set(Math.abs(speed));
+     indexer.set(speed);
     }
 
     public void setPivot(double speed) {
-        intakePivot.set(Math.abs(speed));
+        intakePivot.set(speed);
     }
     public void setLift(double speed) {
-        lift.set(Math.abs(speed));
+        lift.set(speed);
     }
     //stop functions
     public void stopTurret() {

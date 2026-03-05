@@ -158,22 +158,22 @@ public class RobotContainer {
     // ROD DRIVING CONTROLS
     driverXbox2 //intakeIN
       .leftBumper()
-      .onTrue(Commands.run(() -> intake.setIntake(0.4), intake))
+      .onTrue(Commands.run(() -> intake.setIntake(Math.abs(0.4)), intake))
       .onFalse(Commands.run(() -> intake.stopIntake(), intake));
       
     driverXbox2 //intakeOUT
       .rightBumper()
-      .onTrue(Commands.run(() -> intake.setIntake(-0.4), intake)) //this better work -0.2
+      .onTrue(Commands.run(() -> intake.setIntake(-Math.abs(0.4)), intake)) //this better work -0.2
       .onFalse(Commands.run(() -> intake.stopIntake(), intake));
 
     driverXbox2//indexer IN
       .rightTrigger()
-      .onTrue(Commands.run(() -> intake.setIndexer(0.5), intake))
+      .onTrue(Commands.run(() -> intake.setIndexer(Math.abs(1)), intake))
       .onFalse(Commands.run(() -> intake.stopIndexing(), intake));
 
     driverXbox2//indexer OUT
       .leftTrigger()
-      .onTrue(Commands.run(() -> intake.setIndexer(-0.5), intake))
+      .onTrue(Commands.run(() -> intake.setIndexer(-Math.abs(0.8)), intake))
       .onFalse(Commands.run(() -> intake.stopIndexing(), intake));
 
     driverXbox2 //slowspeed fire
@@ -203,17 +203,17 @@ public class RobotContainer {
       
     driverXbox2 //pivot retract
       .x()
-      .onTrue(Commands.run(() -> intake.setPivot(-0.5), intake))
+      .onTrue(Commands.run(() -> intake.setPivot(-Math.abs(0.5)), intake))
       .onFalse(Commands.run(() -> intake.stopPivot(), intake));
 
     driverXbox //turret right
       .rightBumper()
-      .onTrue(Commands.run(() -> intake.setTurretR(0.1), intake))
+      .onTrue(Commands.run(() -> intake.setTurretR(Math.abs(0.1)), intake))
       .onFalse(Commands.runOnce(() -> intake.stopTurret(), intake));
 
     driverXbox //turret right
       .leftBumper()
-      .onTrue(Commands.run(() -> intake.setTurretL(-0.1), intake))   
+      .onTrue(Commands.run(() -> intake.setTurretL(-Math.abs(0.1)), intake))   
       .onFalse(Commands.runOnce(() -> intake.stopTurret(), intake));
 
    // driverXbox
