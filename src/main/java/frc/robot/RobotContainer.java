@@ -300,6 +300,11 @@ driverXbox.povUp()
    *
    * @return the command to run in autonomous
    */
+  public void setMotorBrake(boolean brake)
+  {
+    drivebase.setMotorBrake(brake);
+  }
+  
   public Command getAutonomousCommand() {
     return Autos.exampleAuto(m_exampleSubsystem, intake);
   }

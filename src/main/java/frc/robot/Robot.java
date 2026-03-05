@@ -1,7 +1,9 @@
 // ...existing code...
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -13,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
+  private final Timer disabledTimer = new Timer();
 
   @Override
   public void robotInit() {
@@ -30,7 +33,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-    // Optional: cancel anything if desired when disabled
+    m_robotContainer.setMotorBrake(true);
+    disabledTimer.reset();
+    disabledTimer.start();
   }
 
   @Override
