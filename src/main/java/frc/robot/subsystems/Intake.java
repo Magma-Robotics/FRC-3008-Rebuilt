@@ -173,6 +173,21 @@ public class Intake extends SubsystemBase{
         turret.set(speed);
     }
 
+    public void setTurretToOrigin(double speed) {
+        double pos = turret.getPosition().getValueAsDouble();
+        if (pos > 0) {
+            turret.set(-Math.abs(speed));
+        } else if (pos < 0) {
+            turret.set(Math.abs(speed));
+        } else {
+            turret.set(0);
+        }
+    }
+
+    public double getTurretPosition() {
+        return turret.getPosition().getValueAsDouble();
+    }
+
     public void setIntake(double speed) {
         intake.set(speed);
     }
