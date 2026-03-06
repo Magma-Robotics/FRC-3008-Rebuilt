@@ -15,6 +15,8 @@ import swervelib.SwerveInputStream;
 
 import java.io.File;
 
+import com.revrobotics.spark.SparkMax;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -30,6 +32,11 @@ import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -155,6 +162,10 @@ public class RobotContainer {
       .onTrue(Commands.run(() -> intake.setLift(1), intake))
       .onFalse(Commands.run(() -> intake.stopLift(), intake));
 
+    // driverXbox
+    //   .x()
+    //   .onTrue(Commands.runOnce(() -> intake.setTurretToOrigin(0.1), intake));
+
     // ROD DRIVING CONTROLS
     driverXbox2 //intakeIN
       .leftBumper()
@@ -168,12 +179,12 @@ public class RobotContainer {
 
     driverXbox2//indexer IN
       .rightTrigger()
-      .onTrue(Commands.run(() -> intake.setIndexer(Math.abs(1)), intake))
+      .onTrue(Commands.run(() -> intake.setIndexer(1), intake))
       .onFalse(Commands.run(() -> intake.stopIndexing(), intake));
 
     driverXbox2//indexer OUT
       .leftTrigger()
-      .onTrue(Commands.run(() -> intake.setIndexer(-Math.abs(0.8)), intake))
+      .onTrue(Commands.run(() -> intake.setIndexer(-1), intake))
       .onFalse(Commands.run(() -> intake.stopIndexing(), intake));
 
     driverXbox2 //slowspeed fire
@@ -188,12 +199,12 @@ public class RobotContainer {
     
     driverXbox2 //feeder forward
       .a()
-      .onTrue(Commands.run(() -> intake.setFeeder(0.7), intake))
+      .onTrue(Commands.run(() -> intake.setFeeder(Math.abs(0.4)), intake))
       .onFalse(Commands.run(() -> intake.stopFeeding(), intake));
 
     driverXbox2 //feeder reverse
       .b()
-      .onTrue(Commands.run(() -> intake.setFeeder(-0.7), intake))
+      .onTrue(Commands.run(() -> intake.setFeeder(-Math.abs(0.4)), intake))
       .onFalse(Commands.run(() -> intake.stopFeeding(), intake));
 
     driverXbox2 //pivot extend

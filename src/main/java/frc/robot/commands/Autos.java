@@ -16,14 +16,16 @@ public final class Autos {
     // Build an actual command sequence (do not create commands inside a runOnce lambda)
     return Commands.sequence(
         // Turn turret to the right for 0.75s
-        Commands.runOnce(() -> intake.setTurretL(0.05), intake),
-        new WaitCommand(0.25),
 
-        // Stop turret
-        Commands.runOnce(() -> intake.setTurretL(0.0), intake),
-        
+
+                        // Commands.runOnce(() -> intake.setTurretL(0.1),intake),
+                        // new WaitCommand(0.367),
+
+                        // // Stop turret
+                        // Commands.runOnce(() -> intake.setTurretL(0.0), intake),
+                        
         // Hood Up      
-        Commands.runOnce(() -> intake.hoodUp(0.01), intake),
+        Commands.runOnce(() -> intake.hoodUp(0.05), intake),
         new WaitCommand(0.25),
 
         // Stops Hood from Overshooting
@@ -32,7 +34,7 @@ public final class Autos {
         
         // Spin up flywheel and wait
         Commands.runOnce(() -> intake.setflyWheel33(), intake),
-        new WaitCommand(2.5),
+        new WaitCommand(1.5),
 
         // Start indexing/feeding
         Commands.runOnce(() -> {
@@ -41,17 +43,52 @@ public final class Autos {
         }, intake),
 
         // Wait while shooting
-        new WaitCommand(13),
+        new WaitCommand(2),
+        
+        Commands.runOnce(() -> intake.unjamFeeder(), intake),
+
+        Commands.runOnce(() -> intake.multiFeeder(), intake),
+
+        Commands.runOnce(() -> intake.unjamFeeder(), intake),
+
+        Commands.runOnce(() -> intake.multiFeeder(), intake),
+
+        Commands.runOnce(() -> intake.unjamFeeder(), intake),
+
+        Commands.runOnce(() -> intake.multiFeeder(), intake),
+
+        Commands.runOnce(() -> intake.unjamFeeder(), intake),
+
+        Commands.runOnce(() -> intake.multiFeeder(), intake),
+
+        Commands.runOnce(() -> intake.unjamFeeder(), intake),
+
+        Commands.runOnce(() -> intake.multiFeeder(), intake),
+
+        new WaitCommand(2.5),
+
 
         Commands.runOnce(() -> intake.setFlywheelZero(0)),
+        
+                          // //going back
+                          // Commands.runOnce(() -> intake.setTurretR(0.1)),
+                          // new WaitCommand(0.367),
 
-        // Return turret to origin (runs until position reached), then stop turret
-        Commands.run(() -> intake.setTurretToOrigin(0.1), intake)
-            .until(() -> Math.abs(intake.getTurretPosition()) <= 0.01)
-            .andThen(Commands.runOnce(intake::stopTurret, intake)),
+                          // Commands.runOnce(() -> intake.setTurretR(0)),
+
+
+
+
+
+
+        // Return turret to origin (runs until position reached), then stop turret)
+
+        // Commands.run(() -> intake.setTurretToOrigin(0.1), intake)
+        //     .until(() -> Math.abs(intake.getTurretPosition()) <= 0.01)
+        //     .andThen(Commands.runOnce(intake::stopTurret, intake)),
 
         // Hood Down
-        Commands.runOnce(() -> intake.hoodDown(0.01), intake),
+        Commands.runOnce(() -> intake.hoodDown(0.05), intake),
         new WaitCommand(0.25),
         
         // Stops the hood to dig down too much to avoid motor burns

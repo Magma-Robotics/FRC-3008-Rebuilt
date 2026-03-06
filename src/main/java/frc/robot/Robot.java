@@ -6,6 +6,10 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.Intake;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -70,6 +74,12 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancel all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+    //SparkMax(22, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless)
+
+    // test for the sparkmax for the hood to be locked
+          // SparkMax hood = new SparkMax(22, MotorType.kBrushless);
+          // hood.set(0);
+          // hood.setIdleMode(IdleMode.kBrake);
   }
 
   @Override

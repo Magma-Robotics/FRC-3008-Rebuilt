@@ -5,6 +5,7 @@ import org.opencv.core.Mat;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -21,6 +22,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.Command;
 
 public class Intake extends SubsystemBase{
     private SparkMax counterRoller, indexer, hood;
@@ -35,6 +38,12 @@ public class Intake extends SubsystemBase{
     private TalonFXConfiguration intakeConfig, flyWheel1Config, flyWheel2Config, turretConfig, feederConfig;
 
     //private RelativeEncoder intakePivotEncoder;
+
+    // keep a periodically-updated cached turret position so commands using setTurretToOrigin/readers see fresh values
+    private volatile double turretPosition = 0.0;
+
+    ////Mr. Reid's Code///////
+    private final PositionVoltage m_positionVoltage = new PositionVoltage(0).withSlot(0);
 
     public Intake() {
         //change CAN IDs
@@ -56,20 +65,26 @@ public class Intake extends SubsystemBase{
         flyWheel2Config = new TalonFXConfiguration();
         flyWheel1Config = new TalonFXConfiguration();
         turretConfig = new TalonFXConfiguration();
+        //Mr. Reid's Code
+        // turretConfig.Slot0.kP = 50;
+        // turretConfig.Slot0.kI = 0.0;
+        // turretConfig.Slot0.kD = 0.01;
+        // turret.setPosition(0);
+        ///
+        
         feederConfig = new TalonFXConfiguration();   
         counterRollerConfig = new SparkMaxConfig(); 
-        hoodConfig = new SparkMaxConfig(); 
+        hoodConfig = new SparkMaxConfig();
         indexerConfig = new SparkMaxConfig(); 
 
         intakePivotConfig = new SparkFlexConfig();
         liftConfig = new SparkFlexConfig();
 
-
         
         VelocityVoltage velocityRequest = new VelocityVoltage(50);
         velocityRequest2 = new VelocityVoltage(80);
         velocityRequest1 = new VelocityVoltage(50);
-        velocityRequest3 = new VelocityVoltage(67);
+        velocityRequest3 = new VelocityVoltage(75);
 
         var slot0 = flyWheel1Config.Slot0;
         slot0.kP = 0.12;  // Proportional gain
@@ -140,42 +155,53 @@ public class Intake extends SubsystemBase{
         turret.getConfigurator().apply(turretConfig);
         //indexer.getConfigurator().apply(indexerConfig);
     }
+
+    // // update cached sensors every scheduler tick so commands see fresh values
+    // @Override
+    // public void periodic() {
+    //     try {
+    //         turretPosition = turret.getPosition().getValueAsDouble();
+    //     } catch (Exception e) {
+    //         // keep last known value on read failure
+    //     }
+    // }
+
     //functions??
     //turn-on
+
+    // /////Mr. Reid's Code//////
+    // public Command autoTurret1(){
+    //     return runOnce(
+    //         () -> {
+    //             turret.setControl(m_positionVoltage.withPosition(-5.0)); // Adjust the position as needed);
+    //         }
+    //     );
+    // }
+
+
     public void setTurretR(double speed) {
-        if(speed > 0){
-            if(turret.getPosition().getValueAsDouble() >= 3.999) {
+        // use cached turretPosition and maintain soft limits
+        // clamp speed to [-1,1]
+        double p = Math.max(-1.0, Math.min(1.0, speed));
+
+        if (p > 0) {
+            if (turretPosition >= 3.999) {
+                turret.set(0);
+                return;
+            }
+        } else if (p < 0) {
+            if (turretPosition <= -4.585) {
                 turret.set(0);
                 return;
             }
         }
 
-        if(speed < 0){
-            if(turret.getPosition().getValueAsDouble() <= -4.585) {
-                turret.set(0);
-                return;
-            }
-        }
-
-        turret.set(speed);
+        turret.set(p);
     }
     
     public void setTurretL(double speed) {
-        if(speed > 0){
-            if(turret.getPosition().getValueAsDouble() >= 3.999) {
-                turret.set(0);
-                return;
-            }
-        }
-
-        if(speed < 0){
-            if(turret.getPosition().getValueAsDouble() <= -4.585) {
-                turret.set(0);
-                return;
-            }
-        }
-
-        turret.set(speed);
+        // same behavior as setTurretR (keeps original calling signatures)
+        setTurretR(speed);
     }
 
     public void hoodUp(double speed) {
@@ -185,20 +211,32 @@ public class Intake extends SubsystemBase{
     public void hoodDown(double speed) {
         hood.set(-Math.abs(speed));
     }
+    
+    // public void setTurretToOrigin(double speed) {
+    //     // non-blocking: call repeatedly until getTurretPosition() within tolerance, then stop.
+    //     final double TOLERANCE = 0.01; // adjust for your encoder units
+    //     double pos = turretPosition;
 
-    public void setTurretToOrigin(double speed) {
-        double pos = turret.getPosition().getValueAsDouble();
-        if (pos > 0) {
-            turret.set(-Math.abs(speed));
-        } else if (pos < 0) {
-            turret.set(Math.abs(speed));
-        } else {
-            turret.set(0);
-        }
-    }
+    //     if (Double.isNaN(pos)) {
+    //         // defensive: if we don't have a valid reading, don't drive
+    //         turret.set(0);
+    //         return;
+    //     }
+
+    //     if (Math.abs(pos) <= TOLERANCE) {
+    //         turret.set(0);
+    //         return;
+    //     }
+
+    //     // drive toward zero using sign of position
+    //     double direction = -Math.signum(pos); // +1 or -1 toward zero
+    //     double p = Math.min(Math.max(Math.abs(speed), 0.0), 1.0); // positive magnitude
+    //     turret.set(direction * p);
+    // }
 
     public double getTurretPosition() {
-        return turret.getPosition().getValueAsDouble();
+        // return cached, frequently-updated value
+        return turretPosition;
     }
 
     public void setIntake(double speed) {
@@ -221,53 +259,75 @@ public class Intake extends SubsystemBase{
     }
 
      public void setFeeder(double speed) {
-        feeder.set(Math.abs(speed));
-        counterRoller.set(-Math.abs(speed));
+        feeder.set(speed);
+        counterRoller.set(-speed);
 
     }
     
      public void setIndexer(double speed) {
-     indexer.set(speed);
+        indexer.set(speed);
     }
 
     public void setPivot(double speed) {
         intakePivot.set(speed);
     }
+
     public void setLift(double speed) {
         lift.set(speed);
     }
+
     //stop functions
     public void stopTurret() {
-        turret.set(Math.abs(0));
+        turret.set(0);
     }
+
     public void stopIntake() {
-        intake.set(Math.abs(0));
+        intake.set(0);
     }
+
     public void stopflyWheel() {
-        flyWheel1.set(Math.abs(0));
-        flyWheel2.set(Math.abs(0));
+        flyWheel1.set(0);
+        flyWheel2.set(0);
     }
+
     public void stopFeeding() {
-        feeder.set(Math.abs(0));
-        counterRoller.set(Math.abs(0));
+        feeder.set(0);
+        counterRoller.set(0);
     }
+
     public void stopIndexing() {
-        indexer.set(Math.abs(0));
+        indexer.set(0);
     }
+
     public void stopPivot() {
-        intakePivot.set(Math.abs(0));
+        intakePivot.set(0);
     }
+
     public void stopLift() {
-        lift.set(Math.abs(0));
+        lift.set(0);
     }
 
     public void setFlywheelZero(double speed) {
         flyWheel1.set(Math.abs(speed));
         flyWheel2.set(Math.abs(speed));
     }
+    
+    public void unjamFeeder() {
+        // example: reverse feeder and counter-roller to clear jams
+        feeder.set(0.8); //keeps intaking either way, but reverses the counter-roller to clear jams
+        counterRoller.set(-0.5);
+        new WaitCommand(0.5);
+            feeder.set(0);
+            counterRoller.set(0);
+    }
 
-    //public double getIntakePivotEncoderPosition() {
-    //    return intakePivotEncoder.getPosition();
-    //}
+    public void multiFeeder() {
+        feeder.set(0.8);
+        counterRoller.set(0.5);
+        new WaitCommand(2);
+            feeder.set(0);
+            counterRoller.set(0);
+    }
+    
 
 }
