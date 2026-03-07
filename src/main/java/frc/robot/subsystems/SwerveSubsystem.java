@@ -123,6 +123,7 @@ public class SwerveSubsystem extends SubsystemBase
     RobotConfig config;
     try
     {
+      long t0 = System.nanoTime();
       config = RobotConfig.fromGUISettings();
 
       final boolean enableFeedforward = true;
@@ -173,10 +174,18 @@ public class SwerveSubsystem extends SubsystemBase
           // Reference to this subsystem to set requirements
                            );
 
+      long elapsedMs = (System.nanoTime() - t0) / 1_000_000;
+      if (elapsedMs > 100) {
+        String msg = "setupPathPlanner took " + elapsedMs + " ms";
+        System.out.println(msg);
+        DriverStation.reportWarning(msg, false);
+      }
+
     } catch (Exception e)
     {
       // Handle exception as needed
       e.printStackTrace();
+      DriverStation.reportError("PathPlanner setup failed: " + e.getMessage(), false);
     }
 
     //Preload PathPlanner Path finding

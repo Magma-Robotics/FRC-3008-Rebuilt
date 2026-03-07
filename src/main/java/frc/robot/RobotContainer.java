@@ -17,10 +17,12 @@ import java.io.File;
 
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -32,11 +34,34 @@ import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
+
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import java.io.File;
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.IdealStartingState;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
+import com.pathplanner.lib.path.PathPoint;
+import com.pathplanner.lib.pathfinding.*;
+
+import edu.wpi.first.math.controller.PIDController;
+
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.SwerveSubsystem;
+import swervelib.SwerveInputStream;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -125,6 +150,8 @@ public class RobotContainer {
 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
+
+
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
@@ -317,6 +344,26 @@ driverXbox.povUp()
   }
   
   public Command getAutonomousCommand() {
-    return Autos.exampleAuto(m_exampleSubsystem, intake);
+    // Build the autonomous commands but protect against exceptions during construction.
+    try {
+      // Run the PathPlanner auto and the intake autos sequence at the same time.
+      // PathPlanner auto controls the SwerveSubsystem; the intake sequence uses the Intake subsystem,
+      // so they can safely run in parallel without resource conflicts.
+      Command pathCmd = drivebase.getAutonomousCommand("Draft Auto Blue 1");
+      Command intakeCmd = Autos.exampleAuto(m_exampleSubsystem, intake);
+      return Commands.parallel(pathCmd, intakeCmd);
+    } catch (Exception e) {
+      e.printStackTrace();
+      // Report to DriverStation and return a safe no-op command so robot code doesn't exit.
+      DriverStation.reportError("Failed to build autonomous commands: " + e.getMessage(), false);
+      return Commands.none();
+    }
+  }
+
+   public Command getPathPlannerAutonomous() {
+    // Use the SwerveSubsystem's PathPlanner integration (AutoBuilder/PathPlannerAuto)
+    // The subsystem already exposes a helper that builds a PathPlannerAuto command
+    // with the given path name (configured via the PathPlanner GUI).
+    return drivebase.getAutonomousCommand("Auto_MLR_path");
   }
 }

@@ -26,16 +26,16 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class Intake extends SubsystemBase{
-    private SparkMax counterRoller, indexer, hood;
+    private SparkMax counterRoller, hood;
     private SparkFlex intakePivot, lift;
 
     private SparkFlexConfig intakePivotConfig, liftConfig;
-    private SparkMaxConfig counterRollerConfig, indexerConfig, hoodConfig;
+    private SparkMaxConfig counterRollerConfig, hoodConfig;
 
-    private final TalonFX intake, flyWheel1, flyWheel2, turret, feeder;
+    private final TalonFX intake, flyWheel1, flyWheel2, turret, feeder, indexer;
     private final VelocityVoltage velocityRequest2, velocityRequest1, velocityRequest3;
 
-    private TalonFXConfiguration intakeConfig, flyWheel1Config, flyWheel2Config, turretConfig, feederConfig;
+    private TalonFXConfiguration intakeConfig, flyWheel1Config, flyWheel2Config, turretConfig, feederConfig, indexerConfig;
 
     //private RelativeEncoder intakePivotEncoder;
 
@@ -49,7 +49,7 @@ public class Intake extends SubsystemBase{
         //change CAN IDs
         intakePivot = new SparkFlex(16, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); //intake pivot
         lift = new SparkFlex(17, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); //lift
-        //indexer = new SparkMax(5, MotorType.kBrushless);
+        //indexer = new SparkMax(5, M,otorType.kBrushless);
         intake = new TalonFX(24);
         flyWheel1 = new TalonFX(1);
         flyWheel2 = new TalonFX(0);
@@ -59,7 +59,7 @@ public class Intake extends SubsystemBase{
         counterRoller = new SparkMax(23, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); //22 = hood
         hood = new SparkMax(22, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); //22 = hood
         feeder = new TalonFX(21);
-        indexer = new SparkMax(5, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); //21 = feeder
+        indexer = new TalonFX(5); //21 = feeder
 
         intakeConfig = new TalonFXConfiguration();
         flyWheel2Config = new TalonFXConfiguration();
@@ -75,7 +75,7 @@ public class Intake extends SubsystemBase{
         feederConfig = new TalonFXConfiguration();   
         counterRollerConfig = new SparkMaxConfig(); 
         hoodConfig = new SparkMaxConfig();
-        indexerConfig = new SparkMaxConfig(); 
+        indexerConfig = new TalonFXConfiguration(); 
 
         intakePivotConfig = new SparkFlexConfig();
         liftConfig = new SparkFlexConfig();
@@ -119,10 +119,9 @@ public class Intake extends SubsystemBase{
             .smartCurrentLimit(20)
             .inverted(false)
             .idleMode(IdleMode.kBrake);
-        indexerConfig
-            .smartCurrentLimit(20)
-            .inverted(false)
-            .idleMode(IdleMode.kBrake);
+
+        indexerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         intakeConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -312,22 +311,13 @@ public class Intake extends SubsystemBase{
         flyWheel2.set(Math.abs(speed));
     }
     
-    public void unjamFeeder() {
+    public void shootingMovements(double time) {
         // example: reverse feeder and counter-roller to clear jams
-        feeder.set(0.8); //keeps intaking either way, but reverses the counter-roller to clear jams
-        counterRoller.set(-0.5);
-        new WaitCommand(0.5);
-            feeder.set(0);
-            counterRoller.set(0);
+        feeder.set(0.6); //keeps intaking either way, but reverses the counter-roller to clear jams
+        counterRoller.set(1);
+        new WaitCommand(time);
+        feeder.set(0);
+        counterRoller.set(0);
     }
-
-    public void multiFeeder() {
-        feeder.set(0.8);
-        counterRoller.set(0.5);
-        new WaitCommand(2);
-            feeder.set(0);
-            counterRoller.set(0);
-    }
-    
 
 }
