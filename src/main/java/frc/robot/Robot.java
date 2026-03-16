@@ -72,6 +72,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand = m_robotContainer.getAutonomousCommand();
       if (m_autonomousCommand != null) {
         m_autonomousCommand.schedule();
+        System.out.println("Scheduled autonomous command: " + m_autonomousCommand.getName());
       }
     } catch (Exception e) {
       // Print stack trace to console and report to DriverStation so you can see the error

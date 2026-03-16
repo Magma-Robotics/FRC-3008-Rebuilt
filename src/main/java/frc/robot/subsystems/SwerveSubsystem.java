@@ -121,6 +121,17 @@ public class SwerveSubsystem extends SubsystemBase
     // Load the RobotConfig from the GUI settings. You should probably
     // store this in your Constants file
     RobotConfig config;
+
+    // If PathPlanner settings.json is not deployed, skip PathPlanner setup to avoid
+    // a FileNotFoundException during robot startup. Users should deploy the
+    // PathPlanner 'settings.json' via src/main/deploy/pathplanner or the Gradle deploy task.
+    java.io.File settingsFile = new java.io.File(edu.wpi.first.wpilibj.Filesystem.getDeployDirectory(), "pathplanner/settings.json");
+    if (!settingsFile.exists()) {
+      String msg = "PathPlanner settings.json not found at " + settingsFile.getAbsolutePath() + "; skipping PathPlanner setup.";
+      System.out.println(msg);
+      edu.wpi.first.wpilibj.DriverStation.reportWarning(msg, false);
+      return;
+    }
     try
     {
       long t0 = System.nanoTime();
