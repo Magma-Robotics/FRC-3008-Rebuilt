@@ -110,8 +110,9 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
-    Rotation2d rawHeading = swerveDrive.getGyro().getRawRotation3d().toRotation2d();
-    double yaw = rawHeading.getRadians();
+    // Rotation2d rawHeading = swerveDrive.getGyro().getRawRotation3d().toRotation2d();
+    // double yaw = rawHeading.getRadians();
+    double yaw = swerveDrive.getGyroRotation3d().getZ();
     LimelightHelpers.SetRobotOrientation("", yaw, 0.0, 0.0, 0.0, 0.0, 0.0);
     LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("");
     if(limelightMeasurement.tagCount > 0){
@@ -471,22 +472,22 @@ public class SwerveSubsystem extends SubsystemBase
   {
     return run(() -> {
       //AUTO MODIFIED!!!
-      // ChassisSpeeds modifiedSpeeds = velocity.get();
-      // if(isAutoAimMode && Math.abs(modifiedSpeeds.omegaRadiansPerSecond) < 0.1){ //Check if we are in auto aim mode and driver does not want control
-      //   //Angle PID
-      //   modifiedSpeeds.omegaRadiansPerSecond = angleToGoal * 0.035;
-      // }
-      // else{
-      //   isAutoAimMode = false;
-      // }
-      // SmartDashboard.putString("Raw Chassisspeeds", modifiedSpeeds.toString());
-      // SmartDashboard.putNumber("Input y", modifiedSpeeds.vyMetersPerSecond);
-      // SmartDashboard.putNumber("Input x", modifiedSpeeds.vxMetersPerSecond);
-      // SmartDashboard.putNumber("Input radians", modifiedSpeeds.omegaRadiansPerSecond);
-      // SmartDashboard.putBoolean("Swerve Auto Aim", isAutoAimMode);
-      // swerveDrive.driveFieldOriented(modifiedSpeeds);
+      ChassisSpeeds modifiedSpeeds = velocity.get();
+      if(isAutoAimMode && Math.abs(modifiedSpeeds.omegaRadiansPerSecond) < 0.1){ //Check if we are in auto aim mode and driver does not want control
+        //Angle PID
+        modifiedSpeeds.omegaRadiansPerSecond = angleToGoal * 0.035;
+      }
+      else{
+        isAutoAimMode = false;
+      }
+      SmartDashboard.putString("Raw Chassisspeeds", modifiedSpeeds.toString());
+      SmartDashboard.putNumber("Input y", modifiedSpeeds.vyMetersPerSecond);
+      SmartDashboard.putNumber("Input x", modifiedSpeeds.vxMetersPerSecond);
+      SmartDashboard.putNumber("Input radians", modifiedSpeeds.omegaRadiansPerSecond);
+      SmartDashboard.putBoolean("Swerve Auto Aim", isAutoAimMode);
+      swerveDrive.driveFieldOriented(modifiedSpeeds);
       //ORIGINAL CODE
-      swerveDrive.driveFieldOriented(velocity.get());
+      //swerveDrive.driveFieldOriented(velocity.get());
     });
   }
 
