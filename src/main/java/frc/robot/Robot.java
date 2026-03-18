@@ -2,9 +2,12 @@
 package frc.robot;
 
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.Intake;
@@ -31,7 +34,12 @@ import com.pathplanner.lib.pathfinding.*;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
+  private SwerveDrive m_swerve = new SwerveDrive();
+  private final XboxController m_controller = new XboxController(0);
   private final Timer disabledTimer = new Timer();
+  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
 
   @Override
   public void robotInit() {
@@ -123,6 +131,41 @@ public class Robot extends TimedRobot {
     targetingAngularVelocity *= -1.0;
 
     return targetingAngularVelocity;
+  }
+
+  private void drive(boolean fieldRelative) {
+    // Get the x speed. We are inverting this because Xbox controllers return
+    // negative values when we push forward.
+    var xSpeed =
+        -m_xspeedLimiter.calculate(MathUtil.applyDeadband(m_controller.getLeftY(), 0.02))
+            * SwerveDrive.kMaxSpeed;
+
+    // Get the y speed or sideways/strafe speed. We are inverting this because
+    // we want a positive value when we pull to the left. Xbox controllers
+    // return positive values when you pull to the right by default.
+    var ySpeed =
+        -m_yspeedLimiter.calculate(MathUtil.applyDeadband(m_controller.getLeftX(), 0.02))
+            * SwerveDrive.kMaxSpeed;
+
+    // Get the rate of angular rotation. We are inverting this because we want a
+    // positive value when we pull to the left (remember, CCW is positive in
+    // mathematics). Xbox controllers return positive values when you pull to
+    // the right by default.
+    var rot =
+        -m_rotLimiter.calculate(MathUtil.applyDeadband(m_controller.getRightX(), 0.02))
+            * SwerveDrive.kMaxAngularSpeed;
+
+    // while the B-button is pressed, overwrite some of the driving values with the output of our limelight methods
+    if(m_controller.getBButton())
+    {
+        final var rot_limelight = limelight_aim_proportional();
+        rot = rot_limelight;
+
+        //while using Limelight, turn off field-relative driving.
+        fieldRelative = false;
+    }
+
+    m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative, getPeriod());
   }
 
   @Override
