@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Radians;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.*;
@@ -110,5 +111,10 @@ public final class Constants
           TRANS_CONTROLLER,
           ROTATION_CONTROLLER);
     }
+  }
+
+  public static class AutonomyConstants{
+    public static final Translation2d BLUE_GOAL_COORDS = new Translation2d(1.8211, 1.5884);
+    public static final Translation2d RED_GOAL_COORDS = new Translation2d(4.7011, 1.5884);
   }
 }

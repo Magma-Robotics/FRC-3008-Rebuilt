@@ -27,6 +27,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -55,6 +56,9 @@ public class SwerveSubsystem extends SubsystemBase
    * Swerve drive object.
    */
   private final SwerveDrive swerveDrive;
+
+  private boolean isAutoAimMode;
+  private double angleToGoal;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -106,6 +110,26 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
+    Rotation2d rawHeading = swerveDrive.getGyro().getRawRotation3d().toRotation2d();
+    double yaw = rawHeading.getRadians();
+    LimelightHelpers.SetRobotOrientation("", yaw, 0.0, 0.0, 0.0, 0.0, 0.0);
+    LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("");
+    if(limelightMeasurement.tagCount > 0){
+      swerveDrive.addVisionMeasurement(limelightMeasurement.pose, limelightMeasurement.timestampSeconds);
+    } 
+
+    if(isAutoAimMode){
+      Pose2d currentLoc = swerveDrive.getPose();
+      var alliance = DriverStation.getAlliance();
+      Translation2d vecToGoal;
+      if(alliance.get() == DriverStation.Alliance.Red){
+        vecToGoal = Constants.AutonomyConstants.RED_GOAL_COORDS.minus(currentLoc.getTranslation());
+      }
+      else{
+        vecToGoal = Constants.AutonomyConstants.BLUE_GOAL_COORDS.minus(currentLoc.getTranslation());
+      }
+      angleToGoal = swerveDrive.getGyro().getRotation3d().toRotation2d().getRadians() - Math.atan2(vecToGoal.getY(), vecToGoal.getX());
+    }
   }
 
   @Override
@@ -446,6 +470,22 @@ public class SwerveSubsystem extends SubsystemBase
   public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity)
   {
     return run(() -> {
+      //AUTO MODIFIED!!!
+      // ChassisSpeeds modifiedSpeeds = velocity.get();
+      // if(isAutoAimMode && Math.abs(modifiedSpeeds.omegaRadiansPerSecond) < 0.1){ //Check if we are in auto aim mode and driver does not want control
+      //   //Angle PID
+      //   modifiedSpeeds.omegaRadiansPerSecond = angleToGoal * 0.035;
+      // }
+      // else{
+      //   isAutoAimMode = false;
+      // }
+      // SmartDashboard.putString("Raw Chassisspeeds", modifiedSpeeds.toString());
+      // SmartDashboard.putNumber("Input y", modifiedSpeeds.vyMetersPerSecond);
+      // SmartDashboard.putNumber("Input x", modifiedSpeeds.vxMetersPerSecond);
+      // SmartDashboard.putNumber("Input radians", modifiedSpeeds.omegaRadiansPerSecond);
+      // SmartDashboard.putBoolean("Swerve Auto Aim", isAutoAimMode);
+      // swerveDrive.driveFieldOriented(modifiedSpeeds);
+      //ORIGINAL CODE
       swerveDrive.driveFieldOriented(velocity.get());
     });
   }
@@ -677,5 +717,13 @@ public class SwerveSubsystem extends SubsystemBase
   public SwerveDrive getSwerveDrive()
   {
     return swerveDrive;
+  }
+
+  public void autoAimMode(){
+    isAutoAimMode = !isAutoAimMode;
+  }
+
+  public void setAutoAimMode(boolean mode){
+    isAutoAimMode = mode;
   }
 }

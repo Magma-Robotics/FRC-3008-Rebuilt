@@ -179,6 +179,10 @@ public class RobotContainer {
       .a()
       .onTrue(Commands.runOnce(() -> drivebase.zeroGyro()));
 
+    driverXbox
+      .b()
+      .onTrue(Commands.runOnce(() -> drivebase.autoAimMode()));
+
     driverXbox //liftDown
       .povDown()
       .onTrue(Commands.run(() -> intake.setLift(-1), intake))
@@ -365,5 +369,9 @@ driverXbox.povUp()
     // The subsystem already exposes a helper that builds a PathPlannerAuto command
     // with the given path name (configured via the PathPlanner GUI).
     return drivebase.getAutonomousCommand("Auto_MLR_path");
+  }
+
+  public void initForTeleop(){
+    drivebase.setAutoAimMode(false);
   }
 }
