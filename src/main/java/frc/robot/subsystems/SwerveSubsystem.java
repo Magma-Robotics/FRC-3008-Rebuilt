@@ -112,9 +112,10 @@ public class SwerveSubsystem extends SubsystemBase
   {
     // Rotation2d rawHeading = swerveDrive.getGyro().getRawRotation3d().toRotation2d();
     // double yaw = rawHeading.getRadians();
-    double yaw = swerveDrive.getGyroRotation3d().getZ();
+    double yaw = swerveDrive.getYaw().getRadians();
     LimelightHelpers.SetRobotOrientation("", yaw, 0.0, 0.0, 0.0, 0.0, 0.0);
     LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("");
+    //LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("");
     if(limelightMeasurement.tagCount > 0){
       swerveDrive.addVisionMeasurement(limelightMeasurement.pose, limelightMeasurement.timestampSeconds);
     } 
@@ -129,7 +130,7 @@ public class SwerveSubsystem extends SubsystemBase
       else{
         vecToGoal = Constants.AutonomyConstants.BLUE_GOAL_COORDS.minus(currentLoc.getTranslation());
       }
-      angleToGoal = swerveDrive.getGyro().getRotation3d().toRotation2d().getRadians() - Math.atan2(vecToGoal.getY(), vecToGoal.getX());
+      angleToGoal = swerveDrive.getYaw().getRadians()- Math.atan2(vecToGoal.getY(), vecToGoal.getX());
     }
   }
 
