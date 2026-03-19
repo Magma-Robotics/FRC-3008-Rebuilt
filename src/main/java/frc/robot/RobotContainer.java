@@ -7,9 +7,9 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 //import frc.robot.commands.Autos;
 import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Modules;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Modules;
 //import frc.robot.subsystems.Shooter;
 import swervelib.SwerveInputStream;
 
@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Modules;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -59,7 +59,7 @@ import edu.wpi.first.math.controller.PIDController;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Modules;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -77,7 +77,7 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/main"));
-  private final Intake intake = new Intake();
+  private final Modules modules = new Modules();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverXbox =
@@ -185,78 +185,68 @@ public class RobotContainer {
 
     driverXbox //liftDown
       .povDown()
-      .onTrue(Commands.run(() -> intake.setLift(-1), intake))
-      .onFalse(Commands.run(() -> intake.stopLift(), intake));
+      .onTrue(Commands.run(() -> modules.setLift(-1), modules))
+      .onFalse(Commands.run(() -> modules.stopLift(), modules));
 
     driverXbox //liftUp
       .povUp()
-      .onTrue(Commands.run(() -> intake.setLift(1), intake))
-      .onFalse(Commands.run(() -> intake.stopLift(), intake));
+      .onTrue(Commands.run(() -> modules.setLift(1), modules))
+      .onFalse(Commands.run(() -> modules.stopLift(), modules));
 
     // driverXbox
     //   .x()
-    //   .onTrue(Commands.runOnce(() -> intake.setTurretToOrigin(0.1), intake));
+    //   .onTrue(Commands.runOnce(() -> modules.setTurretToOrigin(0.1), modules));
 
     // ROD DRIVING CONTROLS
-    driverXbox2 //intakeIN
+    driverXbox2 //INintake
       .leftBumper()
-      .onTrue(Commands.run(() -> intake.setIntake(Math.abs(0.4)), intake))
-      .onFalse(Commands.run(() -> intake.stopIntake(), intake));
+      .onTrue(Commands.run(() -> modules.setIntake(Math.abs(0.4)), modules))
+      .onFalse(Commands.run(() -> modules.stopIntake(), modules));
       
     driverXbox2 //intakeOUT
       .rightBumper()
-      .onTrue(Commands.run(() -> intake.setIntake(-Math.abs(0.4)), intake)) //this better work -0.2
-      .onFalse(Commands.run(() -> intake.stopIntake(), intake));
+      .onTrue(Commands.run(() -> modules.setIntake(-Math.abs(0.4)), modules)) //this better work -0.2
+      .onFalse(Commands.run(() -> modules.stopIntake(), modules));
 
     driverXbox2//indexer IN
       .rightTrigger()
-      .onTrue(Commands.run(() -> intake.setIndexer(1), intake))
-      .onFalse(Commands.run(() -> intake.stopIndexing(), intake));
+      .onTrue(Commands.run(() -> modules.setIndexer(1), modules))
+      .onFalse(Commands.run(() -> modules.stopIndexing(), modules));
 
     driverXbox2//indexer OUT
       .leftTrigger()
-      .onTrue(Commands.run(() -> intake.setIndexer(-1), intake))
-      .onFalse(Commands.run(() -> intake.stopIndexing(), intake));
+      .onTrue(Commands.run(() -> modules.setIndexer(-1), modules))
+      .onFalse(Commands.run(() -> modules.stopIndexing(), modules));
 
     driverXbox2 //slowspeed fire
       .povDown()
-      .onTrue(Commands.run(() -> intake.setflyWheel11(), intake))
-      .onFalse(Commands.run(() -> intake.stopflyWheel(), intake));
+      .onTrue(Commands.run(() -> modules.setflyWheel11(), modules))
+      .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
     
     driverXbox2 //fastspeed fire
       .povUp()
-      .onTrue(Commands.run(() -> intake.setflyWheel22(), intake))
-      .onFalse(Commands.run(() -> intake.stopflyWheel(), intake));
+      .onTrue(Commands.run(() -> modules.setflyWheel22(), modules))
+      .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
     
     driverXbox2 //feeder forward
       .a()
-      .onTrue(Commands.run(() -> intake.setFeeder(Math.abs(0.4)), intake))
-      .onFalse(Commands.run(() -> intake.stopFeeding(), intake));
+      .onTrue(Commands.run(() -> modules.setFeeder(Math.abs(0.4)), modules))
+      .onFalse(Commands.run(() -> modules.stopFeeding(), modules));
 
     driverXbox2 //feeder reverse
-      .b()
-      .onTrue(Commands.run(() -> intake.setFeeder(-Math.abs(0.4)), intake))
-      .onFalse(Commands.run(() -> intake.stopFeeding(), intake));
+      .b()  
+      .onTrue(Commands.run(() -> modules.setFeeder(-Math.abs(0.4)), modules))
+      .onFalse(Commands.run(() -> modules.stopFeeding(), modules));
 
     driverXbox2 //pivot extend
       .y()
-      .onTrue(Commands.run(() -> intake.setPivot(0.5), intake))
-      .onFalse(Commands.run(() -> intake.stopPivot(), intake));
+      .onTrue(Commands.run(() -> modules.setPivot(0.5), modules))
+      .onFalse(Commands.run(() -> modules.stopPivot(), modules));
       
     driverXbox2 //pivot retract
       .x()
-      .onTrue(Commands.run(() -> intake.setPivot(-Math.abs(0.5)), intake))
-      .onFalse(Commands.run(() -> intake.stopPivot(), intake));
-
-    driverXbox //turret right
-      .rightBumper()
-      .onTrue(Commands.run(() -> intake.setTurretR(Math.abs(0.1)), intake))
-      .onFalse(Commands.runOnce(() -> intake.stopTurret(), intake));
-
-    driverXbox //turret right
-      .leftBumper()
-      .onTrue(Commands.run(() -> intake.setTurretL(-Math.abs(0.1)), intake))   
-      .onFalse(Commands.runOnce(() -> intake.stopTurret(), intake));
+      .onTrue(Commands.run(() -> modules.setPivot(-Math.abs(0.5)), modules))
+      .onFalse(Commands.run(() -> modules.stopPivot(), modules));
 
    // driverXbox
       //.leftBumper()
@@ -354,8 +344,8 @@ driverXbox.povUp()
       // PathPlanner auto controls the SwerveSubsystem; the intake sequence uses the Intake subsystem,
       // so they can safely run in parallel without resource conflicts.
       Command pathCmd = drivebase.getAutonomousCommand("Draft Auto Blue 1");
-      Command intakeCmd = Autos.exampleAuto(m_exampleSubsystem, intake);
-      return Commands.parallel(pathCmd, intakeCmd);
+      Command modulesCmd = Autos.exampleAuto(m_exampleSubsystem, modules);
+      return Commands.parallel(pathCmd, modulesCmd);
     } catch (Exception e) {
       e.printStackTrace();
       // Report to DriverStation and return a safe no-op command so robot code doesn't exit.
