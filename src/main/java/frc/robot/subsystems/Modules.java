@@ -1,20 +1,14 @@
 package frc.robot.subsystems;
 
-import org.opencv.core.Mat;
-
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.sim.TalonFXSimState.MotorType;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
-import com.revrobotics.ColorSensorV3.MainControl;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkFlexConfig;
@@ -22,14 +16,14 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.networktables.GenericEntry;
 
 public class Modules extends SubsystemBase{
     private SparkMax counterRoller, counterRoller2;
-    // private SparkFlex intakePivot, lift;
+    private SparkFlex intakePivot; //, lift;
 
-    // private SparkFlexConfig intakePivotConfig, liftConfig;
+    private SparkFlexConfig intakePivotConfig; //, liftConfig;
     private SparkMaxConfig counterRollerConfig, counterRoller2Config;
 
     private final TalonFX intake, flyWheel1, flyWheel2, feeder, indexer;
@@ -37,13 +31,20 @@ public class Modules extends SubsystemBase{
 
     private TalonFXConfiguration intakeConfig, flyWheel1Config, flyWheel2Config, turretConfig, feederConfig, indexerConfig;
 
+    // encoder for the intake pivot SparkFlex
+    private RelativeEncoder intakePivotEncoder;
+    // Shuffleboard entry for pivot position
+    private GenericEntry pivotPositionEntry;
+    
+    // Duplicate TalonFX fields removed - use the canonical fields declared above:
+    // intake, flyWheel1, flyWheel2, feeder, indexer
+
     public Modules() {
         //Declaration of CanIDs
         
         //SparkFlex
-        //intakePivot = new SparkFlex(16, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+        intakePivot = new SparkFlex(16, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
         //lift = new SparkFlex(17, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-
         //TalonFX
         intake = new TalonFX(24);
         flyWheel1 = new TalonFX(1);
@@ -62,7 +63,6 @@ public class Modules extends SubsystemBase{
         intakeConfig = new TalonFXConfiguration();
         flyWheel2Config = new TalonFXConfiguration();
         flyWheel1Config = new TalonFXConfiguration();
-        turretConfig = new TalonFXConfiguration();
         feederConfig = new TalonFXConfiguration();   
         indexerConfig = new TalonFXConfiguration(); 
         
@@ -71,10 +71,9 @@ public class Modules extends SubsystemBase{
         counterRoller2Config = new SparkMaxConfig(); 
 
         //SparkFlex
-        //intakePivotConfig = new SparkFlexConfig();
+        intakePivotConfig = new SparkFlexConfig();
         //liftConfig = new SparkFlexConfig();
         
-        VelocityVoltage velocityRequest = new VelocityVoltage(50);
         velocityRequest2 = new VelocityVoltage(80);
         velocityRequest1 = new VelocityVoltage(50);
         velocityRequest3 = new VelocityVoltage(67);
@@ -109,8 +108,28 @@ public class Modules extends SubsystemBase{
         //     .smartCurrentLimit(20)
         //     .inverted(false)
         //     .idleMode(IdleMode.kBrake);
-        
 
+        // initialize intake pivot encoder (defensive)
+        try {
+            intakePivotEncoder = intakePivot.getEncoder();
+        } catch (Exception e) {
+            intakePivotEncoder = null;
+            System.out.println("Warning: intakePivot encoder not available: " + e.getMessage());
+        }
+
+        // Shuffleboard entry
+        try {
+            pivotPositionEntry = Shuffleboard.getTab("Diagnostics").add("Intake Pivot Position", Double.NaN).getEntry();
+        } catch (Exception e) {
+            pivotPositionEntry = null;
+            System.out.println("Warning: could not create Shuffleboard entry: " + e.getMessage());
+        }
+
+        var currentConfigs = new CurrentLimitsConfigs();
+        currentConfigs.StatorCurrentLimit = 60; // Limits torque/acceleration
+        currentConfigs.StatorCurrentLimitEnable = true;
+        currentConfigs.SupplyCurrentLimit = 40; // Protects battery/breaker
+        currentConfigs.SupplyCurrentLimitEnable = true;
         indexerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
@@ -131,10 +150,18 @@ public class Modules extends SubsystemBase{
 
         counterRoller.configure(counterRollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         counterRoller2.configure(counterRoller2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        intakePivot.configure(intakePivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        
         feeder.getConfigurator().apply(feederConfig);
         intake.getConfigurator().apply(intakeConfig);
         flyWheel1.getConfigurator().apply(flyWheel1Config);
         flyWheel2.getConfigurator().apply(flyWheel2Config);
+
+        intake.getConfigurator().apply(currentConfigs);
+        flyWheel1.getConfigurator().apply(currentConfigs);
+        flyWheel2.getConfigurator().apply(currentConfigs);
+        feeder.getConfigurator().apply(currentConfigs);
+        indexer.getConfigurator().apply(currentConfigs);
     }
 
 
@@ -207,13 +234,61 @@ public class Modules extends SubsystemBase{
         indexer.set(0);
     }
 
-    // public void setPivot(double speed) {
-    //     intakePivot.set(speed);
-    // }
+    public void setPivot(double speed) {
+        double pos = Double.NaN;
+        if (intakePivotEncoder != null) {
+            try {
+                pos = intakePivotEncoder.getPosition();
+            } catch (Exception e) {
+                pos = Double.NaN;
+            }
+        }
 
-    // public void stopPivot() {
-    //     intakePivot.set(0);
-    // }
+        if (!Double.isNaN(pos)) {
+            if (pos >= 3.999 && speed > 0) {
+                intakePivot.set(0);
+                return;
+            }
+            if (pos <= -4.585 && speed < 0) {
+                intakePivot.set(0);
+                return;
+            }
+        }
+
+        intakePivot.set(speed);
+    }
+
+    public void stopPivot() {
+        intakePivot.set(0);
+    }
+
+    /**
+     * Return the intake pivot position from the SparkFlex encoder.
+     * Returns Double.NaN if the encoder is unavailable or an error occurs.
+     */
+    public double getPivotPosition() {
+        if (intakePivotEncoder == null) {
+            return Double.NaN;
+        }
+        try {
+            return intakePivotEncoder.getPosition();
+        } catch (Exception e) {
+            return Double.NaN;
+        }
+    }
+
+    @Override
+    public void periodic() {
+        // Publish pivot position to Shuffleboard (if created)
+        if (pivotPositionEntry != null) {
+            double pos = getPivotPosition();
+            try {
+                pivotPositionEntry.setDouble(pos);
+            } catch (Exception e) {
+                // Ignore failures to write telemetry
+            }
+        }
+    }
 
     // public void setLift(double speed) {
     //     lift.set(speed);

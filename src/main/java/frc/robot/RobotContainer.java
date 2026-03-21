@@ -233,92 +233,7 @@ public class RobotContainer {
       .onTrue(Commands.run(() -> modules.setFeederBack(-Math.abs(1)), modules))
       .onFalse(Commands.run(() -> modules.stopFeeding(), modules));
 
-    // driverXbox2 //pivot extend
-    //   .y()
-    //   .onTrue(Commands.run(() -> modules.setPivot(0.5), modules))
-    //   .onFalse(Commands.run(() -> modules.stopPivot(), modules));
-      
-    // driverXbox2 //pivot retract
-    //   .x()
-    //   .onTrue(Commands.run(() -> modules.setPivot(-Math.abs(0.5)), modules))
-    //   .onFalse(Commands.run(() -> modules.stopPivot(), modules));
-
-   // driverXbox
-      //.leftBumper()
-      //.onTrue(Commands.run(() -> drivebase.setHeadingOffset(Rotation2d.fromDegrees(180))))
-      //.onFalse(Commands.run(() -> drivebase.setHeadingOffset(Rotation2d.fromDegrees(0))));
-    /*
-    //odometry/*
-    driverXbox
-      .a()
-      .onTrue(Commands.run(() -> Intake.setFeeder(0.2), Intake))
-      .onFalse(Commands.run(() -> Intake.stopFeeder(),Intake));
-      
-      //.onTrue(resetOdometry());
-      */
-    //intake
-// In RobotContainer.java
-
-/*
-// Button B: Move to 90 degrees and stay there
-driverXbox.b()
-    .onTrue(Commands.runOnce(() -> m_intake.goToDegree(90), m_intake));
-
-// Button A: Move to 180 degrees and stay there
-driverXbox.a()
-    .onTrue(Commands.runOnce(() -> m_intake.goToDegree(180), m_intake));
-
-// Button X: Stop motor power
-driverXbox.x()
-    .onTrue(Commands.runOnce(() -> m_intake.stopIntake(), m_intake));
-
-// Button Y: Return to zero
-driverXbox.y()
-    .onTrue(Commands.runOnce(() -> m_intake.goToDegree(0), m_intake));
-
-driverXbox.povUp()
-    .onTrue(Commands.run(() -> m_intake.setIntake(0.2), m_intake))
-    .onFalse(Commands.run(() -> m_intake.setIntake(0), m_intake));
-
-    /* 
-    driverXbox
-      .x()
-      .onTrue(Commands.run(() -> Intake.setIndexer(0.2), Intake))
-      .onFalse(Commands.run(() -> Intake.stopIndexer(),Intake));
-    driverXbox
-      .y()
-      .onTrue(Commands.run(() -> Intake.setIntakePivot(0.2), Intake))
-      .onFalse(Commands.run(() -> Intake.stopIntakePivot(),Intake));
-    //shootah
-    driverXbox
-      .povUp()
-      .onTrue(Commands.run(() -> Shooter.setTurret(0.2), Shooter))
-      .onFalse(Commands.run(() -> Shooter.stopTurret(),Shooter));    
-    driverXbox
-      .povDown()
-      .onTrue(Commands.run(() -> Shooter.setFlywheel(0.2), Shooter))
-      .onFalse(Commands.run(() -> Shooter.stopFlyWheel(),Shooter));  
-    driverXbox
-      .povLeft()
-      .onTrue(Commands.run(() -> Shooter.setCounterRoller(0.2), Shooter))
-      .onFalse(Commands.run(() -> Shooter.stopCounterRoller(),Shooter));  
-    driverXbox
-      .povRight()
-      .onTrue(Commands.run(() -> Shooter.setHood(0.2), Shooter))
-      .onFalse(Commands.run(() -> Shooter.stopHood(),Shooter)); 
-
-        //Intake.setIntake(0.1); // 
-
-        //Hunter note
-        //runonce: one rotation at set power, run: until controller is off
-        //onTrue: doesn't
-      
-      //driver.a().onTrue(new ExampleCommand()); //#toggle
-    //driverXbox.x().whileTrue(Commands.run(() -> intake.startIntake()));
-      //intake.startIntake(1);  
-    */
-
-      }
+    }
 
   
 
@@ -341,7 +256,7 @@ driverXbox.povUp()
     // Use the SwerveSubsystem's PathPlanner integration (AutoBuilder/PathPlannerAuto)
     // The subsystem already exposes a helper that builds a PathPlannerAuto command
     // with the given path name (configured via the PathPlanner GUI).
-    return drivebase.getAutonomousCommand("Auto_MLR_path");
+    return drivebase.getAutonomousCommand("Draft-Auto-Blue-1");
   }
 
   public void initForTeleop(){
