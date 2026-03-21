@@ -26,11 +26,11 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class Modules extends SubsystemBase{
-    private SparkMax counterRoller, counterroller2;
+    private SparkMax counterRoller, counterRoller2;
     private SparkFlex intakePivot, lift;
 
     private SparkFlexConfig intakePivotConfig, liftConfig;
-    private SparkMaxConfig counterRollerConfig, hoodConfig;
+    private SparkMaxConfig counterRollerConfig, counterRoller2Config;
 
     private final TalonFX intake, flyWheel1, flyWheel2, feeder, indexer;
     private final VelocityVoltage velocityRequest2, velocityRequest1, velocityRequest3;
@@ -41,8 +41,8 @@ public class Modules extends SubsystemBase{
         //Declaration of CanIDs
         
         //SparkFlex
-        intakePivot = new SparkFlex(16, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-        lift = new SparkFlex(17, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+        //intakePivot = new SparkFlex(16, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+        //lift = new SparkFlex(17, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
 
         //TalonFX
         intake = new TalonFX(24);
@@ -51,9 +51,9 @@ public class Modules extends SubsystemBase{
         feeder = new TalonFX(21);
         indexer = new TalonFX(5);
 
-        //SparkMax
+        //SparkMax - Minion
         counterRoller = new SparkMax(23, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-        counterroller2 = new SparkMax(22, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); 
+        counterRoller2 = new SparkMax(22, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); 
         
 
         //Configurator
@@ -68,22 +68,22 @@ public class Modules extends SubsystemBase{
         
         //SparkMax
         counterRollerConfig = new SparkMaxConfig(); 
-        hoodConfig = new SparkMaxConfig();
+        counterRoller2Config = new SparkMaxConfig(); 
 
         //SparkFlex
-        intakePivotConfig = new SparkFlexConfig();
-        liftConfig = new SparkFlexConfig();
+        //intakePivotConfig = new SparkFlexConfig();
+        //liftConfig = new SparkFlexConfig();
         
         VelocityVoltage velocityRequest = new VelocityVoltage(50);
         velocityRequest2 = new VelocityVoltage(80);
         velocityRequest1 = new VelocityVoltage(50);
-        velocityRequest3 = new VelocityVoltage(75);
+        velocityRequest3 = new VelocityVoltage(67);
 
         //PID vals for the shooter
         
         var slot0 = flyWheel1Config.Slot0;
         slot0.kP = 0.12;  // Proportional gain
-        slot0.kI = 0.0;   // Integral gain
+        slot0.kI = 0.0;   // Integral gainl
         slot0.kD = 0.01;  // Derivative gain
         slot0.kV = 0.11;  // Feedforward (Crucial for velocity)
 
@@ -99,9 +99,10 @@ public class Modules extends SubsystemBase{
             .smartCurrentLimit(20)
             .inverted(false)
             .idleMode(IdleMode.kCoast);
-        counterRollerConfig
+
+        counterRoller2Config
             .smartCurrentLimit(20)
-            .inverted(true)
+            .inverted(false)
             .idleMode(IdleMode.kCoast);
 
         intakePivotConfig //sparkflex(idk if this works)
@@ -128,6 +129,7 @@ public class Modules extends SubsystemBase{
         turretConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         counterRoller.configure(counterRollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        counterRoller2.configure(counterRoller2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         feeder.getConfigurator().apply(feederConfig);
         intake.getConfigurator().apply(intakeConfig);
         flyWheel1.getConfigurator().apply(flyWheel1Config);
@@ -156,14 +158,20 @@ public class Modules extends SubsystemBase{
 
     public void setFeeder(double speed) {
         feeder.set(speed);
+        counterRoller.set(Math.abs(speed));
+        counterRoller2.set(-Math.abs(speed));
+    }
+
+    public void setFeederBack(double speed) {
+        feeder.set(speed);
         counterRoller.set(-Math.abs(speed));
-        counterroller2.set(Math.abs(speed));
+        counterRoller2.set(Math.abs(speed));
     }
 
     public void stopFeeding() {
         feeder.set(0);
         counterRoller.set(0);
-        counterroller2.set(0);
+        counterRoller2.set(0);
     }
 
     public void stopflyWheel() {
@@ -198,20 +206,20 @@ public class Modules extends SubsystemBase{
         indexer.set(0);
     }
 
-    public void setPivot(double speed) {
-        intakePivot.set(speed);
-    }
+    // public void setPivot(double speed) {
+    //     intakePivot.set(speed);
+    // }
 
-    public void stopPivot() {
-        intakePivot.set(0);
-    }
+    // public void stopPivot() {
+    //     intakePivot.set(0);
+    // }
 
-    public void setLift(double speed) {
-        lift.set(speed);
-    }
+    // public void setLift(double speed) {
+    //     lift.set(speed);
+    // }
 
-    public void stopLift() {
-        lift.set(0);
-    }
+    // public void stopLift() {
+    //     lift.set(0);
+    // }
     
 }

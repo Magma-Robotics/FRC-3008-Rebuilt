@@ -74,22 +74,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    // Get the autonomous command from the container and schedule it.
-    // Guard with try/catch so a thrown exception in construction/scheduling
-    // doesn't kill the robot process and cause a restart.
-    try {
       m_autonomousCommand = m_robotContainer.getAutonomousCommand();
       if (m_autonomousCommand != null) {
         m_autonomousCommand.schedule();
-        System.out.println("Scheduled autonomous command: " + m_autonomousCommand.getName());
       }
-    } catch (Exception e) {
-      // Print stack trace to console and report to DriverStation so you can see the error
-      e.printStackTrace();
-      DriverStation.reportError("Failed to start autonomous: " + e.getMessage(), false);
-      // Fallback to no-op command to ensure robot stays running
-      m_autonomousCommand = edu.wpi.first.wpilibj2.command.Commands.none();
-    }
   }
 
   @Override

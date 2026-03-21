@@ -59,6 +59,8 @@ public class SwerveSubsystem extends SubsystemBase
 
   private boolean isAutoAimMode;
   private double angleToGoal;
+  private double desiredSwerveSpeed;
+  private double autoAimKp=.035;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -476,7 +478,9 @@ public class SwerveSubsystem extends SubsystemBase
       ChassisSpeeds modifiedSpeeds = velocity.get();
       if(isAutoAimMode && Math.abs(modifiedSpeeds.omegaRadiansPerSecond) < 0.1){ //Check if we are in auto aim mode and driver does not want control
         //Angle PID
-        modifiedSpeeds.omegaRadiansPerSecond = angleToGoal * 0.035;
+        desiredSwerveSpeed= angleToGoal * autoAimKp;//.035
+        modifiedSpeeds.omegaRadiansPerSecond = desiredSwerveSpeed;
+        // if works acualy apply movment to chassis.
       }
       else{
         isAutoAimMode = false;

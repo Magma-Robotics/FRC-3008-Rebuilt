@@ -15,127 +15,77 @@ public final class Autos {
     // Build an actual command sequence (do not create commands inside a runOnce lambda)
     return Commands.sequence(
       
-      new WaitCommand(1.3),// Time 0.3 elapsed
+      // new WaitCommand(1.3),// Time 0.3 elapsed
 
-      // Run pivot and shooting at the same time:
-      // - Pivot runs for 1.00s and then stops
-      // - Shooting (flywheels + feeder/indexer) runs for 2.83s and then stops
-      Commands.parallel(
-        // Pivot sequence
-        Commands.sequence(
-          Commands.runOnce(() -> modules.setPivot(0.5), modules),
-          new WaitCommand(0.83),
-          Commands.runOnce(() -> modules.stopPivot(), modules)
-        ),
+      // // Run pivot and shooting at the same time:
+      // // - Pivot runs for 1.00s and then stops
+      // // - Shooting (flywheels + feeder/indexer) runs for 2.83s and then stops
+      // Commands.parallel(
+      //   // Pivot sequence
+      //   Commands.sequence(
+      //     Commands.runOnce(() -> modules.setPivot(0.5), modules),
+      //     new WaitCommand(0.83),
+      //     Commands.runOnce(() -> modules.stopPivot(), modules)
+      //   ),
 
-        // Shooting sequence
-        Commands.sequence(
-          // start flywheels and feeding
-          Commands.runOnce(() -> {
-            modules.setflyWheel22(); // use the higher velocity configuration
-            modules.setIndexer(0.5);
-            modules.setFeeder(0.6);
-          }, modules),
-          new WaitCommand(2.83),
-          // stop everything related to shooting
-          Commands.runOnce(() -> {
-            modules.stopIndexing();
-            modules.stopFeeding();
-            modules.stopflyWheel();
-          }, modules)
-        )
-      ),
+      //   // Shooting sequence
+      //   Commands.sequence(
+      //     // start flywheels and feeding
+      //     Commands.runOnce(() -> {
+      //       modules.setflyWheel22(); // use the higher velocity configuration
+      //       modules.setIndexer(0.5);
+      //       modules.setFeeder(0.6);
+      //     }, modules),
+      //     new WaitCommand(2.83),
+      //     // stop everything related to shooting
+      //     Commands.runOnce(() -> {
+      //       modules.stopIndexing();
+      //       modules.stopFeeding();
+      //       modules.stopflyWheel();
+      //     }, modules)
+      //   )
+      // ),
 
-      Commands.runOnce(() -> modules.setIntake(0.6), modules),
+      // Commands.runOnce(() -> modules.setIntake(0.6), modules),
 
-      new WaitCommand(2.09), // Time 6.31 elapsed
-      Commands.runOnce(() -> modules.setIntake(0), modules),
+      // new WaitCommand(2.09), // Time 6.31 elapsed
+      // Commands.runOnce(() -> modules.setIntake(0), modules),
 
-      new WaitCommand(1.16), //time 7.47 elapsed
+      // new WaitCommand(1.16), //time 7.47 elapsed
 
-      Commands.runOnce(() -> modules.setIntake(0.6), modules),
+      // Commands.runOnce(() -> modules.setIntake(0.6), modules),
 
-      new WaitCommand(2.4), // Time 14.49 elapsed
+      // new WaitCommand(2.4), // Time 14.49 elapsed
 
-      Commands.runOnce(() -> modules.setIntake(0), modules),
+      // Commands.runOnce(() -> modules.setIntake(0), modules),
 
-
-
-
+      // Turn turret to the right for 0.75s
 
 
+      // Commands.runOnce(() -> intake.setTurretL(0.1),intake),
+      // new WaitCommand(0.367),
 
-
-                  //       // Turn turret to the right for 0.75s
-
-
-                  //                       // Commands.runOnce(() -> intake.setTurretL(0.1),intake),
-                  //                       // new WaitCommand(0.367),
-
-                  //                       // // Stop turret
-                  //                       // Commands.runOnce(() -> intake.setTurretL(0.0), intake),
+      // // Stop turret
+      // Commands.runOnce(() -> intake.setTurretL(0.0), intake),
                                         
-                  //       // Hood Up      
-                  //       Commands.runOnce(() -> intake.hoodUp(0.05), intake),
-                  //       new WaitCommand(0.25),
+      Commands.runOnce(() -> modules.setflyWheel33(), modules),
 
-                  //       // Stops Hood from Overshooting
-                  //       Commands.runOnce(() -> intake.hoodUp(0.0), intake),
+      new WaitCommand(3),
 
-                        
-                  //       // Spin up flywheel and wait
-                  //       Commands.runOnce(() -> intake.setflyWheel33(), intake),
-                  //       new WaitCommand(1.5),
+      Commands.runOnce(() -> {
+        modules.setFeeder(1);
+        modules.setIndexer(0.75);
+      }),
 
-                  //       // Start indexing/feeding
-                  //       Commands.runOnce(() -> {
-                  //         intake.setIndexer(0.5);
-                  //         intake.setFeeder(0.6);
-                  //       }, intake),
+      new WaitCommand(10),
+      
+      Commands.runOnce(() -> {
+        modules.setFeeder(0);
+        modules.setIndexer(0);
+        modules.setFlywheelZero(0);
+      }),
 
-                  //       // Wait while shooting
-                  //       new WaitCommand(2),
-                        
-                  //       Commands.runOnce(() -> intake.shootingMovements(), intake),
-                  //       Commands.runOnce(() -> intake.stopflyWheel()),
-                        
-                  //       new WaitCommand(2.5),
-
-
-                  //       Commands.runOnce(() -> intake.setFlywheelZero(0)),
-                        
-                  //                         // //going back
-                  //                         // Commands.runOnce(() -> intake.setTurretR(0.1)),
-                  //                         // new WaitCommand(0.367),
-
-                  //                         // Commands.runOnce(() -> intake.setTurretR(0)),
-
-
-
-
-
-
-                  //       // Return turret to origin (runs until position reached), then stop turret)
-
-                  //       // Commands.run(() -> intake.setTurretToOrigin(0.1), intake)
-                  //       //     .until(() -> Math.abs(intake.getTurretPosition()) <= 0.01)
-                  //       //     .andThen(Commands.runOnce(intake::stopTurret, intake)),
-
-                  //       // Hood Down
-                  //       Commands.runOnce(() -> intake.hoodDown(0.05), intake),
-                  //       new WaitCommand(0.25),
-                        
-                  //       // Stops the hood to dig down too much to avoid motor burns
-                  //       Commands.runOnce(() -> intake.hoodDown(0.0), intake),
-
-                  //       // Ensure everything is off
-                  //       Commands.runOnce(() -> {
-                  //         intake.setIndexer(0);
-                  //         intake.setFeeder(0);
-                  //         intake.setFlywheelZero(0);
-                  //       }, intake),
-
-                  //       // keep the existing example method command if you want it included
+                        // keep the existing example method command if you want it included
       subsystem.exampleMethodCommand(),
       Commands.none()
     );

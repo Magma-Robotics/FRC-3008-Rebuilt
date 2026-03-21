@@ -94,8 +94,8 @@ public class RobotContainer {
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                                                                () -> driverXbox.getLeftY() * slowMultiplier,
-                                                                () -> driverXbox.getLeftX() * slowMultiplier)
+                                                                () -> -driverXbox.getLeftY() * slowMultiplier,
+                                                                () -> -driverXbox.getLeftX() * slowMultiplier)
                                                             .withControllerRotationAxis(() -> -driverXbox.getRightX())
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(1)
@@ -153,9 +153,7 @@ public class RobotContainer {
 
 
   public RobotContainer() {
-    // Configure the trigger bindings
     configureBindings();
-
   }
 
   /**
@@ -167,6 +165,7 @@ public class RobotContainer {
    * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
+
   private void configureBindings() {
     drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
 
@@ -183,22 +182,18 @@ public class RobotContainer {
       .b()
       .onTrue(Commands.runOnce(() -> drivebase.autoAimMode()));
 
-    driverXbox //liftDown
-      .povDown()
-      .onTrue(Commands.run(() -> modules.setLift(-1), modules))
-      .onFalse(Commands.run(() -> modules.stopLift(), modules));
+    // driverXbox //liftDown
+    //   .povDown()
+    //   .onTrue(Commands.run(() -> modules.setLift(-1), modules))
+    //   .onFalse(Commands.run(() -> modules.stopLift(), modules));
 
-    driverXbox //liftUp
-      .povUp()
-      .onTrue(Commands.run(() -> modules.setLift(1), modules))
-      .onFalse(Commands.run(() -> modules.stopLift(), modules));
+    // driverXbox //liftUp
+    //   .povUp()
+    //   .onTrue(Commands.run(() -> modules.setLift(1), modules))
+    //   .onFalse(Commands.run(() -> modules.stopLift(), modules));
 
-    // driverXbox
-    //   .x()
-    //   .onTrue(Commands.runOnce(() -> modules.setTurretToOrigin(0.1), modules));
 
-    // ROD DRIVING CONTROLS
-    driverXbox2 //INintake
+    driverXbox2 //intakeIN
       .leftBumper()
       .onTrue(Commands.run(() -> modules.setIntake(Math.abs(0.4)), modules))
       .onFalse(Commands.run(() -> modules.stopIntake(), modules));
@@ -210,17 +205,17 @@ public class RobotContainer {
 
     driverXbox2//indexer IN
       .rightTrigger()
-      .onTrue(Commands.run(() -> modules.setIndexer(1), modules))
+      .onTrue(Commands.run(() -> modules.setIndexer(0.75), modules))
       .onFalse(Commands.run(() -> modules.stopIndexing(), modules));
 
     driverXbox2//indexer OUT
       .leftTrigger()
-      .onTrue(Commands.run(() -> modules.setIndexer(-1), modules))
+      .onTrue(Commands.run(() -> modules.setIndexer(-0.75), modules))
       .onFalse(Commands.run(() -> modules.stopIndexing(), modules));
 
     driverXbox2 //slowspeed fire
       .povDown()
-      .onTrue(Commands.run(() -> modules.setflyWheel11(), modules))
+      .onTrue(Commands.run(() -> modules.setflyWheel33(), modules))
       .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
     
     driverXbox2 //fastspeed fire
@@ -229,24 +224,24 @@ public class RobotContainer {
       .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
     
     driverXbox2 //feeder forward
-      .a()
-      .onTrue(Commands.run(() -> modules.setFeeder(Math.abs(0.4)), modules))
+      .b()
+      .onTrue(Commands.run(() -> modules.setFeeder(Math.abs(1)), modules))
       .onFalse(Commands.run(() -> modules.stopFeeding(), modules));
 
     driverXbox2 //feeder reverse
-      .b()  
-      .onTrue(Commands.run(() -> modules.setFeeder(-Math.abs(0.4)), modules))
+      .a()  
+      .onTrue(Commands.run(() -> modules.setFeederBack(-Math.abs(1)), modules))
       .onFalse(Commands.run(() -> modules.stopFeeding(), modules));
 
-    driverXbox2 //pivot extend
-      .y()
-      .onTrue(Commands.run(() -> modules.setPivot(0.5), modules))
-      .onFalse(Commands.run(() -> modules.stopPivot(), modules));
+    // driverXbox2 //pivot extend
+    //   .y()
+    //   .onTrue(Commands.run(() -> modules.setPivot(0.5), modules))
+    //   .onFalse(Commands.run(() -> modules.stopPivot(), modules));
       
-    driverXbox2 //pivot retract
-      .x()
-      .onTrue(Commands.run(() -> modules.setPivot(-Math.abs(0.5)), modules))
-      .onFalse(Commands.run(() -> modules.stopPivot(), modules));
+    // driverXbox2 //pivot retract
+    //   .x()
+    //   .onTrue(Commands.run(() -> modules.setPivot(-Math.abs(0.5)), modules))
+    //   .onFalse(Commands.run(() -> modules.stopPivot(), modules));
 
    // driverXbox
       //.leftBumper()
@@ -338,20 +333,8 @@ driverXbox.povUp()
   }
   
   public Command getAutonomousCommand() {
-    // Build the autonomous commands but protect against exceptions during construction.
-    try {
-      // Run the PathPlanner auto and the intake autos sequence at the same time.
-      // PathPlanner auto controls the SwerveSubsystem; the intake sequence uses the Intake subsystem,
-      // so they can safely run in parallel without resource conflicts.
-      Command pathCmd = drivebase.getAutonomousCommand("Draft Auto Blue 1");
       Command modulesCmd = Autos.exampleAuto(m_exampleSubsystem, modules);
-      return Commands.parallel(pathCmd, modulesCmd);
-    } catch (Exception e) {
-      e.printStackTrace();
-      // Report to DriverStation and return a safe no-op command so robot code doesn't exit.
-      DriverStation.reportError("Failed to build autonomous commands: " + e.getMessage(), false);
-      return Commands.none();
-    }
+      return Commands.parallel(modulesCmd);
   }
 
    public Command getPathPlannerAutonomous() {
