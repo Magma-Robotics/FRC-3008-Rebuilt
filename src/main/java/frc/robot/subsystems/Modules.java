@@ -27,9 +27,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class Modules extends SubsystemBase{
     private SparkMax counterRoller, counterRoller2;
-    private SparkFlex intakePivot, lift;
+    // private SparkFlex intakePivot, lift;
 
-    private SparkFlexConfig intakePivotConfig, liftConfig;
+    // private SparkFlexConfig intakePivotConfig, liftConfig;
     private SparkMaxConfig counterRollerConfig, counterRoller2Config;
 
     private final TalonFX intake, flyWheel1, flyWheel2, feeder, indexer;
@@ -105,10 +105,11 @@ public class Modules extends SubsystemBase{
             .inverted(false)
             .idleMode(IdleMode.kCoast);
 
-        intakePivotConfig //sparkflex(idk if this works)
-            .smartCurrentLimit(20)
-            .inverted(false)
-            .idleMode(IdleMode.kBrake);
+        // intakePivotConfig //sparkflex(idk if this works)
+        //     .smartCurrentLimit(20)
+        //     .inverted(false)
+        //     .idleMode(IdleMode.kBrake);
+        
 
         indexerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
