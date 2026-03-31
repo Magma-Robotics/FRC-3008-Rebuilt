@@ -9,6 +9,12 @@
           "data": {
             "pathName": " Left Trench 1"
           }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
+          }
         }
       ]
     }

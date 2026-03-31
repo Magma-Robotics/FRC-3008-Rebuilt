@@ -70,12 +70,12 @@ import swervelib.SwerveInputStream;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  private double slowMultiplier = 1;
+  private double slowMultiplier = 0.9;
   // The robot's subsystems and commands are defined here...
   //Shooter Shooter = new Shooter();
   //private final Intake m_intake = new Intake();
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-  private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+  private final SwerveSubsystem      drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/main"));
   private final Modules modules = new Modules();
 
@@ -172,15 +172,15 @@ public class RobotContainer {
     driverXbox
       .rightBumper()
       .onTrue(Commands.run(() -> slowMultiplier = 0.5))
-      .onFalse(Commands.run(() -> slowMultiplier = 1));
+      .onFalse(Commands.run(() -> slowMultiplier = .9));
 
     driverXbox
       .a()
       .onTrue(Commands.runOnce(() -> drivebase.zeroGyro()));
 
-    driverXbox
-      .b()
-      .onTrue(Commands.runOnce(() -> drivebase.autoAimMode()));
+    //driverXbox
+      //.b()
+      //.onTrue(Commands.runOnce(() -> drivebase.autoAimMode()));
 
     // driverXbox //liftDown
     //   .povDown()
@@ -191,7 +191,6 @@ public class RobotContainer {
     //   .povUp()
     //   .onTrue(Commands.run(() -> modules.setLift(1), modules))
     //   .onFalse(Commands.run(() -> modules.stopLift(), modules));
-
 
     driverXbox2 //intakeIN
       .leftBumper()
@@ -213,14 +212,24 @@ public class RobotContainer {
       .onTrue(Commands.run(() -> modules.setIndexer(-0.75), modules))
       .onFalse(Commands.run(() -> modules.stopIndexing(), modules));
 
-    driverXbox2 //slowspeed fire
+    driverXbox2 //67
+      .povLeft()
+      .onTrue(Commands.run(() -> modules.setflyWheelL(), modules))
+      .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
+
+    driverXbox2 //81
       .povDown()
-      .onTrue(Commands.run(() -> modules.setflyWheel33(), modules))
+      .onTrue(Commands.run(() -> modules.setflyWheelD(), modules))
       .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
     
-    driverXbox2 //fastspeed fire
+    driverXbox2 //82
+      .povRight()
+      .onTrue(Commands.run(() -> modules.setflyWheelR(), modules))
+      .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
+    
+    driverXbox2 //83
       .povUp()
-      .onTrue(Commands.run(() -> modules.setflyWheel22(), modules))
+      .onTrue(Commands.run(() -> modules.setflyWheelU(), modules))
       .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
     
     driverXbox2 //feeder forward
@@ -232,6 +241,16 @@ public class RobotContainer {
       .a()  
       .onTrue(Commands.run(() -> modules.setFeederBack(-Math.abs(1)), modules))
       .onFalse(Commands.run(() -> modules.stopFeeding(), modules));
+
+    driverXbox2
+      .x()
+      .onTrue(Commands.run(() -> modules.setPivot(1), modules))
+      .onFalse(Commands.run(() -> modules.stopPivot(), modules));
+
+    driverXbox2
+      .y()
+      .onTrue(Commands.run(() -> modules.setPivot(-1), modules))
+      .onFalse(Commands.run(() -> modules.stopPivot(), modules));
 
     }
 

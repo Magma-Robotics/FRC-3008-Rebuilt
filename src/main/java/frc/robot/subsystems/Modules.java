@@ -20,16 +20,16 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.networktables.GenericEntry;
 
 public class Modules extends SubsystemBase{
-    private SparkMax counterRoller, counterRoller2;
+    private SparkMax counterRoller;
     private SparkFlex intakePivot; //, lift;
 
     private SparkFlexConfig intakePivotConfig; //, liftConfig;
-    private SparkMaxConfig counterRollerConfig, counterRoller2Config;
+    private SparkMaxConfig counterRollerConfig;
 
     private final TalonFX intake, flyWheel1, flyWheel2, feeder, indexer;
-    private final VelocityVoltage velocityRequest2, velocityRequest1, velocityRequest3;
+    private final VelocityVoltage velocityRequestl, velocityRequestd, velocityRequestr, velocityRequestu;
 
-    private TalonFXConfiguration intakeConfig, flyWheel1Config, flyWheel2Config, turretConfig, feederConfig, indexerConfig;
+    private TalonFXConfiguration intakeConfig, flyWheel1Config, flyWheel2Config, feederConfig, indexerConfig;
 
     // encoder for the intake pivot SparkFlex
     private RelativeEncoder intakePivotEncoder;
@@ -54,7 +54,7 @@ public class Modules extends SubsystemBase{
 
         //SparkMax - Minion
         counterRoller = new SparkMax(23, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-        counterRoller2 = new SparkMax(22, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); 
+        //counterRoller2 = new SparkMax(22, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); 
         
 
         //Configurator
@@ -68,15 +68,16 @@ public class Modules extends SubsystemBase{
         
         //SparkMax
         counterRollerConfig = new SparkMaxConfig(); 
-        counterRoller2Config = new SparkMaxConfig(); 
+        //counterRoller2Config = new SparkMaxConfig(); 
 
         //SparkFlex
         intakePivotConfig = new SparkFlexConfig();
         //liftConfig = new SparkFlexConfig();
         
-        velocityRequest2 = new VelocityVoltage(80);
-        velocityRequest1 = new VelocityVoltage(50);
-        velocityRequest3 = new VelocityVoltage(67);
+        velocityRequestl = new VelocityVoltage(79);
+        velocityRequestd = new VelocityVoltage(81);
+        velocityRequestr = new VelocityVoltage(82);
+        velocityRequestu = new VelocityVoltage(83);
 
         //PID vals for the shooter
         
@@ -95,14 +96,11 @@ public class Modules extends SubsystemBase{
         //Configurator Definitions;
 
         counterRollerConfig
-            .smartCurrentLimit(20)
+            .smartCurrentLimit(20, 20, 4000)
             .inverted(false)
             .idleMode(IdleMode.kCoast);
 
-        counterRoller2Config
-            .smartCurrentLimit(20)
-            .inverted(false)
-            .idleMode(IdleMode.kCoast);
+        // l
 
         // intakePivotConfig //sparkflex(idk if this works)
         //     .smartCurrentLimit(20)
@@ -125,11 +123,18 @@ public class Modules extends SubsystemBase{
             System.out.println("Warning: could not create Shuffleboard entry: " + e.getMessage());
         }
 
+        var currentConfigs1 = new CurrentLimitsConfigs();
+        currentConfigs1.StatorCurrentLimit = 40; // Limits torque/acceleration
+        currentConfigs1.StatorCurrentLimitEnable = true;
+        currentConfigs1.SupplyCurrentLimit = 20; // Protects battery/breaker
+        currentConfigs1.SupplyCurrentLimitEnable = true;
+
         var currentConfigs = new CurrentLimitsConfigs();
         currentConfigs.StatorCurrentLimit = 60; // Limits torque/acceleration
         currentConfigs.StatorCurrentLimitEnable = true;
         currentConfigs.SupplyCurrentLimit = 40; // Protects battery/breaker
         currentConfigs.SupplyCurrentLimitEnable = true;
+
         indexerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
@@ -145,11 +150,7 @@ public class Modules extends SubsystemBase{
         flyWheel2Config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         flyWheel2Config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-        turretConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        turretConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
         counterRoller.configure(counterRollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        counterRoller2.configure(counterRoller2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         intakePivot.configure(intakePivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         
         feeder.getConfigurator().apply(feederConfig);
@@ -158,10 +159,10 @@ public class Modules extends SubsystemBase{
         flyWheel2.getConfigurator().apply(flyWheel2Config);
 
         intake.getConfigurator().apply(currentConfigs);
-        flyWheel1.getConfigurator().apply(currentConfigs);
-        flyWheel2.getConfigurator().apply(currentConfigs);
+        // flyWheel1.getConfigurator().apply(currentConfigs);
+        // flyWheel2.getConfigurator().apply(currentConfigs);
         feeder.getConfigurator().apply(currentConfigs);
-        indexer.getConfigurator().apply(currentConfigs);
+        indexer.getConfigurator().apply(currentConfigs1);
     }
 
 
@@ -169,37 +170,39 @@ public class Modules extends SubsystemBase{
 
     //Shooter Module
 
-    public void setflyWheel11() {
-        flyWheel1.setControl(velocityRequest1);
-        flyWheel2.setControl(velocityRequest1);
+    public void setflyWheelL() {
+        flyWheel1.setControl(velocityRequestl);
+        flyWheel2.setControl(velocityRequestl);
     }
 
-    public void setflyWheel22() {
-        flyWheel1.setControl(velocityRequest2);
-        flyWheel2.setControl(velocityRequest2);
+    public void setflyWheelD() {
+        flyWheel1.setControl(velocityRequestd);
+        flyWheel2.setControl(velocityRequestd);
     }
 
-    public void setflyWheel33() {
-        flyWheel1.setControl(velocityRequest3);
-        flyWheel2.setControl(velocityRequest3);
+    public void setflyWheelR() {
+        flyWheel1.setControl(velocityRequestr);
+        flyWheel2.setControl(velocityRequestr);
+    }
+
+    public void setflyWheelU() {
+        flyWheel1.setControl(velocityRequestu);
+        flyWheel2.setControl(velocityRequestu);
     }
 
     public void setFeeder(double speed) {
         feeder.set(speed);
         counterRoller.set(Math.abs(speed));
-        counterRoller2.set(-Math.abs(speed));
     }
 
     public void setFeederBack(double speed) {
         feeder.set(speed);
         counterRoller.set(-Math.abs(speed));
-        counterRoller2.set(Math.abs(speed));
     }
 
     public void stopFeeding() {
         feeder.set(0);
         counterRoller.set(0);
-        counterRoller2.set(0);
     }
 
     public void stopflyWheel() {
@@ -235,25 +238,25 @@ public class Modules extends SubsystemBase{
     }
 
     public void setPivot(double speed) {
-        double pos = Double.NaN;
-        if (intakePivotEncoder != null) {
-            try {
-                pos = intakePivotEncoder.getPosition();
-            } catch (Exception e) {
-                pos = Double.NaN;
-            }
-        }
+        // double pos = Double.NaN;
+        // if (intakePivotEncoder != null) {
+        //     try {
+        //         pos = intakePivotEncoder.getPosition();
+        //     } catch (Exception e) {
+        //         pos = Double.NaN;
+        //     }
+        // }
 
-        if (!Double.isNaN(pos)) {
-            if (pos >= 3.999 && speed > 0) {
-                intakePivot.set(0);
-                return;
-            }
-            if (pos <= -4.585 && speed < 0) {
-                intakePivot.set(0);
-                return;
-            }
-        }
+        // if (!Double.isNaN(pos)) {
+        //     if (pos >= 3.999 && speed > 0) {
+        //         intakePivot.set(0);
+        //         return;
+        //     }
+        //     if (pos <= -4.585 && speed < 0) {
+        //         intakePivot.set(0);
+        //         return;
+        //     }
+        // }
 
         intakePivot.set(speed);
     }

@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
+
 public final class Autos {
   public static Command exampleAuto(ExampleSubsystem subsystem, Modules modules) {
     // Build an actual command sequence (do not create commands inside a runOnce lambda)
@@ -68,7 +69,7 @@ public final class Autos {
       // // Stop turret
       // Commands.runOnce(() -> intake.setTurretL(0.0), intake),
                                         
-      Commands.runOnce(() -> modules.setflyWheel33(), modules),
+      Commands.runOnce(() -> modules.setflyWheelR(), modules),
 
       new WaitCommand(3),
 

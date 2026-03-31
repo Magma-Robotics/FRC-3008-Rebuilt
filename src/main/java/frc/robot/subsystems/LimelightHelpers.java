@@ -700,6 +700,7 @@ public class LimelightHelpers {
 
     public static NetworkTable getLimelightNTTable(String tableName) {
         return NetworkTableInstance.getDefault().getTable(sanitizeName(tableName));
+        
     }
 
     public static void Flush() {
