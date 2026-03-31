@@ -1,101 +1,173 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
+// ...existing code...
 package frc.robot;
 
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.Modules;
+import frc.robot.subsystems.LimelightHelpers;
+
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.IdealStartingState;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
+import com.pathplanner.lib.path.PathPoint;
+import com.pathplanner.lib.pathfinding.*;
 
 /**
- * The methods in this class are called automatically corresponding to each mode, as described in
- * the TimedRobot documentation. If you change the name of this class or the package after creating
- * this project, you must also update the Main.java file in the project.
+ * The VM is configured to automatically run this class, and to call the
+ * functions corresponding to each mode, as described in the TimedRobot
+ * documentation.
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
+  private RobotContainer m_robotContainer;
+  private final XboxController m_controller = new XboxController(0);
+  private final Timer disabledTimer = new Timer();
+  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
 
-  private final RobotContainer m_robotContainer;
-
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
-  public Robot() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
+  @Override
+  public void robotInit() {
+    // Instantiate our RobotContainer. This will perform all our button bindings,
+    // and put our autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
   }
 
-  /**
-   * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
-   * that you want ran during disabled, autonomous, teleoperated and test.
-   *
-   * <p>This runs after the mode specific periodic functions, but before LiveWindow and
-   * SmartDashboard integrated updating.
-   */
   @Override
   public void robotPeriodic() {
-    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, removing finished or interrupted commands,
-    // and running subsystem periodic() methods.  This must be called from the robot's periodic
-    // block in order for anything in the Command-based framework to work.
+    // Measure how long the scheduler run takes to help diagnose loop overruns.
+    long t0 = System.nanoTime();
+    // Run the Scheduler. This is responsible for polling buttons, scheduling,
+    // running, and ending commands.
     CommandScheduler.getInstance().run();
+    long elapsedMs = (System.nanoTime() - t0) / 1_000_000;
+    // Report if the periodic loop is taking longer than 15 ms (leaves some margin below 20 ms)
+    if (elapsedMs > 15) {
+      String msg = "robotPeriodic loop overrun: " + elapsedMs + " ms";
+      System.out.println(msg);
+      DriverStation.reportWarning(msg, false);
+    }
   }
 
-  /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    m_robotContainer.setMotorBrake(true);
+    disabledTimer.reset();
+    disabledTimer.start();
+  }
 
   @Override
   public void disabledPeriodic() {}
 
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    //m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
-    // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(m_autonomousCommand);
-    }
+      m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+      if (m_autonomousCommand != null) {
+        m_autonomousCommand.schedule();
+      }
   }
 
-  /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    // No explicit scheduler call here; robotPeriodic runs CommandScheduler
+  }
 
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
-    if (m_autonomousCommand != null) {
+    // If autonomous is still running when teleop starts, cancel it
+    if (m_autonomousCommand != null && m_autonomousCommand.isScheduled()) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.initForTeleop();
   }
 
-  /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {}
 
+  //limelight helpers
+  // double limelight_aim_proportional()
+  // {    
+  //   // kP (constant of proportionality)
+  //   // this is a hand-tuned number that determines the aggressiveness of our proportional control loop
+  //   // if it is too high, the robot will oscillate.
+  //   // if it is too low, the robot will never reach its target
+  //   // if the robot never turns in the correct direction, kP should be inverted.
+  //   double kP = .035;
+
+  //   // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the rightmost edge of 
+  //   // your limelight 3 feed, tx should return roughly 31 degrees.
+  //   double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kP;
+
+  //   // convert to radians per second for our drive method
+  //   targetingAngularVelocity *= SwerveDrive.kMaxAngularSpeed;
+
+  //   //invert since tx is positive when the target is to the right of the crosshair
+  //   targetingAngularVelocity *= -1.0;
+
+  //   return targetingAngularVelocity;
+  // }
+
+  // private void drive(boolean fieldRelative) {
+  //   // Get the x speed. We are inverting this because Xbox controllers return
+  //   // negative values when we push forward.
+  //   var xSpeed =
+  //       -m_xspeedLimiter.calculate(MathUtil.applyDeadband(m_controller.getLeftY(), 0.02))
+  //           * SwerveDrive.kMaxSpeed;
+
+  //   // Get the y speed or sideways/strafe speed. We are inverting this because
+  //   // we want a positive value when we pull to the left. Xbox controllers
+  //   // return positive values when you pull to the right by default.
+  //   var ySpeed =
+  //       -m_yspeedLimiter.calculate(MathUtil.applyDeadband(m_controller.getLeftX(), 0.02))
+  //           * SwerveDrive.kMaxSpeed;
+
+  //   // Get the rate of angular rotation. We are inverting this because we want a
+  //   // positive value when we pull to the left (remember, CCW is positive in
+  //   // mathematics). Xbox controllers return positive values when you pull to
+  //   // the right by default.
+  //   var rot =
+  //       -m_rotLimiter.calculate(MathUtil.applyDeadband(m_controller.getRightX(), 0.02))
+  //           * SwerveDrive.kMaxAngularSpeed;
+
+  //   // while the B-button is pressed, overwrite some of the driving values with the output of our limelight methods
+  //   if(m_controller.getBButton())
+  //   {
+  //       final var rot_limelight = limelight_aim_proportional();
+  //       rot = rot_limelight;
+
+  //       //while using Limelight, turn off field-relative driving.
+  //       fieldRelative = false;
+  //   }
+
+  //   m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative, getPeriod());
+  // }
+
   @Override
   public void testInit() {
-    // Cancels all running commands at the start of test mode.
+    // Cancel all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+    //SparkMax(22, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless)
+
+    // test for the sparkmax for the hood to be locked
+          // SparkMax hood = new SparkMax(22, MotorType.kBrushless);
+          // hood.set(0);
+          // hood.setIdleMode(IdleMode.kBrake);
   }
 
-  /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
-
-  /** This function is called once when the robot is first started up. */
-  @Override
-  public void simulationInit() {}
-
-  /** This function is called periodically whilst in simulation. */
-  @Override
-  public void simulationPeriodic() {}
 }
+// ...existing code...

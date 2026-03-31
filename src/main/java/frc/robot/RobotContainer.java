@@ -7,23 +7,61 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 //import frc.robot.commands.Autos;
 import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Modules;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Modules;
 //import frc.robot.subsystems.Shooter;
 import swervelib.SwerveInputStream;
 
 import java.io.File;
 
+import com.revrobotics.spark.SparkMax;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.Autos;
+import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Modules;
+import frc.robot.subsystems.SwerveSubsystem;
+import swervelib.SwerveInputStream;
+
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import java.io.File;
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.IdealStartingState;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
+import com.pathplanner.lib.path.PathPoint;
+import com.pathplanner.lib.pathfinding.*;
+
+import edu.wpi.first.math.controller.PIDController;
+
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Modules;
+import frc.robot.subsystems.SwerveSubsystem;
+import swervelib.SwerveInputStream;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -32,14 +70,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  private double slowMultiplier = 1;
+  private double slowMultiplier = 0.9;
   // The robot's subsystems and commands are defined here...
   //Shooter Shooter = new Shooter();
   //private final Intake m_intake = new Intake();
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-  private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+  private final SwerveSubsystem      drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/main"));
-  private final Intake intake = new Intake();
+  private final Modules modules = new Modules();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverXbox =
@@ -56,13 +94,12 @@ public class RobotContainer {
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                                                                () -> driverXbox.getLeftY() * slowMultiplier,
-                                                                () -> driverXbox.getLeftX() * slowMultiplier)
+                                                                () -> -driverXbox.getLeftY() * slowMultiplier,
+                                                                () -> -driverXbox.getLeftX() * slowMultiplier)
                                                             .withControllerRotationAxis(() -> -driverXbox.getRightX())
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(1)
-                                                            .allianceRelativeControl(true);
-
+                                                            .allianceRelativeControl(true);    
   /**
    * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
    */
@@ -113,10 +150,10 @@ public class RobotContainer {
 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    // Configure the trigger bindings
-    configureBindings();
 
+
+  public RobotContainer() {
+    configureBindings();
   }
 
   /**
@@ -128,166 +165,94 @@ public class RobotContainer {
    * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
+
   private void configureBindings() {
     drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
 
     driverXbox
       .rightBumper()
       .onTrue(Commands.run(() -> slowMultiplier = 0.5))
-      .onFalse(Commands.run(() -> slowMultiplier = 1));
+      .onFalse(Commands.run(() -> slowMultiplier = .9));
 
     driverXbox
       .a()
-      .onTrue(Commands.run(() -> drivebase.zeroGyro()));
+      .onTrue(Commands.runOnce(() -> drivebase.zeroGyro()));
 
-    driverXbox //liftDown
-      .povDown()
-      .onTrue(Commands.run(() -> intake.setLift(-1), intake))
-      .onFalse(Commands.run(() -> intake.stopLift(), intake));
+    //driverXbox
+      //.b()
+      //.onTrue(Commands.runOnce(() -> drivebase.autoAimMode()));
 
-    driverXbox //liftUp
-      .povUp()
-      .onTrue(Commands.run(() -> intake.setLift(1), intake))
-      .onFalse(Commands.run(() -> intake.stopLift(), intake));
+    // driverXbox //liftDown
+    //   .povDown()
+    //   .onTrue(Commands.run(() -> modules.setLift(-1), modules))
+    //   .onFalse(Commands.run(() -> modules.stopLift(), modules));
 
-    // ROD DRIVING CONTROLS
+    // driverXbox //liftUp
+    //   .povUp()
+    //   .onTrue(Commands.run(() -> modules.setLift(1), modules))
+    //   .onFalse(Commands.run(() -> modules.stopLift(), modules));
+
     driverXbox2 //intakeIN
       .leftBumper()
-      .onTrue(Commands.run(() -> intake.setIntake(0.4), intake))
-      .onFalse(Commands.run(() -> intake.stopIntake(), intake));
+      .onTrue(Commands.run(() -> modules.setIntake(Math.abs(0.4)), modules))
+      .onFalse(Commands.run(() -> modules.stopIntake(), modules));
       
     driverXbox2 //intakeOUT
       .rightBumper()
-      .onTrue(Commands.run(() -> intake.setIntake(-0.4), intake)) //this better work -0.2
-      .onFalse(Commands.run(() -> intake.stopIntake(), intake));
+      .onTrue(Commands.run(() -> modules.setIntake(-Math.abs(0.4)), modules)) //this better work -0.2
+      .onFalse(Commands.run(() -> modules.stopIntake(), modules));
 
     driverXbox2//indexer IN
       .rightTrigger()
-      .onTrue(Commands.run(() -> intake.setIndexer(0.5), intake))
-      .onFalse(Commands.run(() -> intake.stopIndexing(), intake));
+      .onTrue(Commands.run(() -> modules.setIndexer(0.75), modules))
+      .onFalse(Commands.run(() -> modules.stopIndexing(), modules));
 
     driverXbox2//indexer OUT
       .leftTrigger()
-      .onTrue(Commands.run(() -> intake.setIndexer(-0.5), intake))
-      .onFalse(Commands.run(() -> intake.stopIndexing(), intake));
+      .onTrue(Commands.run(() -> modules.setIndexer(-0.75), modules))
+      .onFalse(Commands.run(() -> modules.stopIndexing(), modules));
 
-    driverXbox2 //slowspeed fire
+    driverXbox2 //67
+      .povLeft()
+      .onTrue(Commands.run(() -> modules.setflyWheelL(), modules))
+      .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
+
+    driverXbox2 //81
       .povDown()
-      .onTrue(Commands.run(() -> intake.setflyWheel11(), intake))
-      .onFalse(Commands.run(() -> intake.stopflyWheel(), intake));
+      .onTrue(Commands.run(() -> modules.setflyWheelD(), modules))
+      .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
     
-    driverXbox2 //fastspeed fire
+    driverXbox2 //82
+      .povRight()
+      .onTrue(Commands.run(() -> modules.setflyWheelR(), modules))
+      .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
+    
+    driverXbox2 //83
       .povUp()
-      .onTrue(Commands.run(() -> intake.setflyWheel22(), intake))
-      .onFalse(Commands.run(() -> intake.stopflyWheel(), intake));
+      .onTrue(Commands.run(() -> modules.setflyWheelU(), modules))
+      .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
     
     driverXbox2 //feeder forward
-      .a()
-      .onTrue(Commands.run(() -> intake.setFeeder(0.7), intake))
-      .onFalse(Commands.run(() -> intake.stopFeeding(), intake));
+      .b()
+      .onTrue(Commands.run(() -> modules.setFeeder(Math.abs(1)), modules))
+      .onFalse(Commands.run(() -> modules.stopFeeding(), modules));
 
     driverXbox2 //feeder reverse
-      .b()
-      .onTrue(Commands.run(() -> intake.setFeeder(-0.7), intake))
-      .onFalse(Commands.run(() -> intake.stopFeeding(), intake));
+      .a()  
+      .onTrue(Commands.run(() -> modules.setFeederBack(-Math.abs(1)), modules))
+      .onFalse(Commands.run(() -> modules.stopFeeding(), modules));
 
-    driverXbox2 //pivot extend
-      .y()
-      .onTrue(Commands.run(() -> intake.setPivot(0.5), intake))
-      .onFalse(Commands.run(() -> intake.stopPivot(), intake));
-      
-    driverXbox2 //pivot retract
+    driverXbox2
       .x()
-      .onTrue(Commands.run(() -> intake.setPivot(-0.5), intake))
-      .onFalse(Commands.run(() -> intake.stopPivot(), intake));
+      .onTrue(Commands.run(() -> modules.setPivot(1), modules))
+      .onFalse(Commands.run(() -> modules.stopPivot(), modules));
 
-    driverXbox //turret right
-      .rightStick()
-      .onTrue(Commands.run(() -> intake.setTurret(0.1), intake))
-      .onFalse(Commands.run(() -> intake.stopTurret(), intake));
-
-
-    driverXbox //turret right
-      .leftStick()
-      .onTrue(Commands.run(() -> intake.setTurret(-0.1), intake))   
-      .onFalse(Commands.run(() -> intake.stopTurret(), intake));
-
-   // driverXbox
-      //.leftBumper()
-      //.onTrue(Commands.run(() -> drivebase.setHeadingOffset(Rotation2d.fromDegrees(180))))
-      //.onFalse(Commands.run(() -> drivebase.setHeadingOffset(Rotation2d.fromDegrees(0))));
-    /*
-    //odometry/*
-    driverXbox
-      .a()
-      .onTrue(Commands.run(() -> Intake.setFeeder(0.2), Intake))
-      .onFalse(Commands.run(() -> Intake.stopFeeder(),Intake));
-      
-      //.onTrue(resetOdometry());
-      */
-    //intake
-// In RobotContainer.java
-
-/*
-// Button B: Move to 90 degrees and stay there
-driverXbox.b()
-    .onTrue(Commands.runOnce(() -> m_intake.goToDegree(90), m_intake));
-
-// Button A: Move to 180 degrees and stay there
-driverXbox.a()
-    .onTrue(Commands.runOnce(() -> m_intake.goToDegree(180), m_intake));
-
-// Button X: Stop motor power
-driverXbox.x()
-    .onTrue(Commands.runOnce(() -> m_intake.stopIntake(), m_intake));
-
-// Button Y: Return to zero
-driverXbox.y()
-    .onTrue(Commands.runOnce(() -> m_intake.goToDegree(0), m_intake));
-
-driverXbox.povUp()
-    .onTrue(Commands.run(() -> m_intake.setIntake(0.2), m_intake))
-    .onFalse(Commands.run(() -> m_intake.setIntake(0), m_intake));
-
-    /* 
-    driverXbox
-      .x()
-      .onTrue(Commands.run(() -> Intake.setIndexer(0.2), Intake))
-      .onFalse(Commands.run(() -> Intake.stopIndexer(),Intake));
-    driverXbox
+    driverXbox2
       .y()
-      .onTrue(Commands.run(() -> Intake.setIntakePivot(0.2), Intake))
-      .onFalse(Commands.run(() -> Intake.stopIntakePivot(),Intake));
-    //shootah
-    driverXbox
-      .povUp()
-      .onTrue(Commands.run(() -> Shooter.setTurret(0.2), Shooter))
-      .onFalse(Commands.run(() -> Shooter.stopTurret(),Shooter));    
-    driverXbox
-      .povDown()
-      .onTrue(Commands.run(() -> Shooter.setFlywheel(0.2), Shooter))
-      .onFalse(Commands.run(() -> Shooter.stopFlyWheel(),Shooter));  
-    driverXbox
-      .povLeft()
-      .onTrue(Commands.run(() -> Shooter.setCounterRoller(0.2), Shooter))
-      .onFalse(Commands.run(() -> Shooter.stopCounterRoller(),Shooter));  
-    driverXbox
-      .povRight()
-      .onTrue(Commands.run(() -> Shooter.setHood(0.2), Shooter))
-      .onFalse(Commands.run(() -> Shooter.stopHood(),Shooter)); 
+      .onTrue(Commands.run(() -> modules.setPivot(-1), modules))
+      .onFalse(Commands.run(() -> modules.stopPivot(), modules));
 
-        //Intake.setIntake(0.1); // 
-
-        //Hunter note
-        //runonce: one rotation at set power, run: until controller is off
-        //onTrue: doesn't
-      
-      //driver.a().onTrue(new ExampleCommand()); //#toggle
-    //driverXbox.x().whileTrue(Commands.run(() -> intake.startIntake()));
-      //intake.startIntake(1);  
-    */
-
-      }
+    }
 
   
 
@@ -296,10 +261,24 @@ driverXbox.povUp()
    *
    * @return the command to run in autonomous
    */
-  //public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    //Intake.setIntake(0.2);
-    
-    //return Autos.exampleAuto(m_exampleSubsystem, Intake);
-  //}
+  public void setMotorBrake(boolean brake)
+  {
+    drivebase.setMotorBrake(brake);
+  }
+  
+  public Command getAutonomousCommand() {
+      Command modulesCmd = Autos.exampleAuto(m_exampleSubsystem, modules);
+      return Commands.parallel(modulesCmd);
+  }
+
+   public Command getPathPlannerAutonomous() {
+    // Use the SwerveSubsystem's PathPlanner integration (AutoBuilder/PathPlannerAuto)
+    // The subsystem already exposes a helper that builds a PathPlannerAuto command
+    // with the given path name (configured via the PathPlanner GUI).
+    return drivebase.getAutonomousCommand("Draft-Auto-Blue-1");
+  }
+
+  public void initForTeleop(){
+    drivebase.setAutoAimMode(false);
+  }
 }

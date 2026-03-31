@@ -8,6 +8,13 @@
       "type": "java",
       "name": "Main",
       "request": "launch",
+      "mainClass": "frc.robot.Main",
+      "projectName": "FRC 2026 Rebuilt"
+    },
+    {
+      "type": "java",
+      "name": "Main",
+      "request": "launch",
       "mainClass": "frc.robot.TestingControls.TestingControls.src.main.java.frc.robot.Main",
       "projectName": "FRC 2026 Rebuilt"
     },
