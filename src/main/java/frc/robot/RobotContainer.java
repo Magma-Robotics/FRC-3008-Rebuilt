@@ -7,9 +7,9 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 //import frc.robot.commands.Autos;
 import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.Modules;
+// import frc.robot.subsystems.Modules;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.Modules;
+// import frc.robot.subsystems.Modules;
 //import frc.robot.subsystems.Shooter;
 import swervelib.SwerveInputStream;
 
@@ -29,9 +29,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
+// import frc.robot.commands.Autos;
 import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.Modules;
+// import frc.robot.subsystems.Modules;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -47,6 +47,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -59,7 +60,7 @@ import edu.wpi.first.math.controller.PIDController;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.Modules;
+// import frc.robot.subsystems.Modules;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -74,10 +75,9 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   //Shooter Shooter = new Shooter();
   //private final Intake m_intake = new Intake();
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final SwerveSubsystem      drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/main"));
-  private final Modules modules = new Modules();
+  // private final Modules modules = new Modules();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverXbox =
@@ -177,82 +177,83 @@ public class RobotContainer {
     driverXbox
       .a()
       .onTrue(Commands.runOnce(() -> drivebase.zeroGyro()));
+  }
 
     //driverXbox
       //.b()
       //.onTrue(Commands.runOnce(() -> drivebase.autoAimMode()));
 
-    // driverXbox //liftDown
-    //   .povDown()
-    //   .onTrue(Commands.run(() -> modules.setLift(-1), modules))
-    //   .onFalse(Commands.run(() -> modules.stopLift(), modules));
+  //   // driverXbox //liftDown
+  //   //   .povDown()
+  //   //   .onTrue(Commands.run(() -> modules.setLift(-1), modules))
+  //   //   .onFalse(Commands.run(() -> modules.stopLift(), modules));
 
-    // driverXbox //liftUp
-    //   .povUp()
-    //   .onTrue(Commands.run(() -> modules.setLift(1), modules))
-    //   .onFalse(Commands.run(() -> modules.stopLift(), modules));
+  //   // driverXbox //liftUp
+  //   //   .povUp()
+  //   //   .onTrue(Commands.run(() -> modules.setLift(1), modules))
+  //   //   .onFalse(Commands.run(() -> modules.stopLift(), modules));
 
-    driverXbox2 //intakeIN
-      .leftBumper()
-      .onTrue(Commands.run(() -> modules.setIntake(Math.abs(0.4)), modules))
-      .onFalse(Commands.run(() -> modules.stopIntake(), modules));
+  //   driverXbox2 //intakeIN
+  //     .leftBumper()
+  //     .onTrue(Commands.run(() -> modules.setIntake(Math.abs(0.4)), modules))
+  //     .onFalse(Commands.run(() -> modules.stopIntake(), modules));
       
-    driverXbox2 //intakeOUT
-      .rightBumper()
-      .onTrue(Commands.run(() -> modules.setIntake(-Math.abs(0.4)), modules)) //this better work -0.2
-      .onFalse(Commands.run(() -> modules.stopIntake(), modules));
+  //   driverXbox2 //intakeOUT
+  //     .rightBumper()
+  //     .onTrue(Commands.run(() -> modules.setIntake(-Math.abs(0.4)), modules)) //this better work -0.2
+  //     .onFalse(Commands.run(() -> modules.stopIntake(), modules));
 
-    driverXbox2//indexer IN
-      .rightTrigger()
-      .onTrue(Commands.run(() -> modules.setIndexer(0.75), modules))
-      .onFalse(Commands.run(() -> modules.stopIndexing(), modules));
+  //   driverXbox2//indexer IN
+  //     .rightTrigger()
+  //     .onTrue(Commands.run(() -> modules.setIndexer(0.75), modules))
+  //     .onFalse(Commands.run(() -> modules.stopIndexing(), modules));
 
-    driverXbox2//indexer OUT
-      .leftTrigger()
-      .onTrue(Commands.run(() -> modules.setIndexer(-0.75), modules))
-      .onFalse(Commands.run(() -> modules.stopIndexing(), modules));
+  //   driverXbox2//indexer OUT
+  //     .leftTrigger()
+  //     .onTrue(Commands.run(() -> modules.setIndexer(-0.75), modules))
+  //     .onFalse(Commands.run(() -> modules.stopIndexing(), modules));
 
-    driverXbox2 //67
-      .povLeft()
-      .onTrue(Commands.run(() -> modules.setflyWheelL(), modules))
-      .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
+  //   driverXbox2 //67
+  //     .povLeft()
+  //     .onTrue(Commands.run(() -> modules.setflyWheelL(), modules))
+  //     .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
 
-    driverXbox2 //81
-      .povDown()
-      .onTrue(Commands.run(() -> modules.setflyWheelD(), modules))
-      .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
+  //   driverXbox2 //81
+  //     .povDown()
+  //     .onTrue(Commands.run(() -> modules.setflyWheelD(), modules))
+  //     .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
     
-    driverXbox2 //82
-      .povRight()
-      .onTrue(Commands.run(() -> modules.setflyWheelR(), modules))
-      .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
+  //   driverXbox2 //82
+  //     .povRight()
+  //     .onTrue(Commands.run(() -> modules.setflyWheelR(), modules))
+  //     .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
     
-    driverXbox2 //83
-      .povUp()
-      .onTrue(Commands.run(() -> modules.setflyWheelU(), modules))
-      .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
+  //   driverXbox2 //83
+  //     .povUp()
+  //     .onTrue(Commands.run(() -> modules.setflyWheelU(), modules))
+  //     .onFalse(Commands.run(() -> modules.stopflyWheel(), modules));
     
-    driverXbox2 //feeder forward
-      .b()
-      .onTrue(Commands.run(() -> modules.setFeeder(Math.abs(1)), modules))
-      .onFalse(Commands.run(() -> modules.stopFeeding(), modules));
+  //   driverXbox2 //feeder forward
+  //     .b()
+  //     .onTrue(Commands.run(() -> modules.setFeeder(Math.abs(1)), modules))
+  //     .onFalse(Commands.run(() -> modules.stopFeeding(), modules));
 
-    driverXbox2 //feeder reverse
-      .a()  
-      .onTrue(Commands.run(() -> modules.setFeederBack(-Math.abs(1)), modules))
-      .onFalse(Commands.run(() -> modules.stopFeeding(), modules));
+  //   driverXbox2 //feeder reverse
+  //     .a()  
+  //     .onTrue(Commands.run(() -> modules.setFeederBack(-Math.abs(1)), modules))
+  //     .onFalse(Commands.run(() -> modules.stopFeeding(), modules));
 
-    driverXbox2
-      .x()
-      .onTrue(Commands.run(() -> modules.setPivot(1), modules))
-      .onFalse(Commands.run(() -> modules.stopPivot(), modules));
+  //   driverXbox2
+  //     .x()
+  //     .onTrue(Commands.run(() -> modules.setPivot(1), modules))
+  //     .onFalse(Commands.run(() -> modules.stopPivot(), modules));
 
-    driverXbox2
-      .y()
-      .onTrue(Commands.run(() -> modules.setPivot(-1), modules))
-      .onFalse(Commands.run(() -> modules.stopPivot(), modules));
+  //   driverXbox2
+  //     .y()
+  //     .onTrue(Commands.run(() -> modules.setPivot(-1), modules))
+  //     .onFalse(Commands.run(() -> modules.stopPivot(), modules));
 
-    }
+  //   }
 
   
 
@@ -267,15 +268,16 @@ public class RobotContainer {
   }
   
   public Command getAutonomousCommand() {
-      Command modulesCmd = Autos.exampleAuto(m_exampleSubsystem, modules);
-      return Commands.parallel(modulesCmd);
+      // Command modulesCmd = Autos.exampleAuto(m_exampleSubsystem/*, modules*/);
+      // return Commands.parallel(modulesCmd);
+      return Commands.none();
   }
 
    public Command getPathPlannerAutonomous() {
     // Use the SwerveSubsystem's PathPlanner integration (AutoBuilder/PathPlannerAuto)
     // The subsystem already exposes a helper that builds a PathPlannerAuto command
     // with the given path name (configured via the PathPlanner GUI).
-    return drivebase.getAutonomousCommand("Draft-Auto-Blue-1");
+    return drivebase.getAutonomousCommand("Auto Trench Left");
   }
 
   public void initForTeleop(){

@@ -2,7 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage; //Keep this line commented out
+//import com.ctre.phoenix6.controls.velocity_duty_cycle.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -32,9 +33,9 @@ public class Modules extends SubsystemBase{
     private TalonFXConfiguration intakeConfig, flyWheel1Config, flyWheel2Config, feederConfig, indexerConfig;
 
     // encoder for the intake pivot SparkFlex
-    private RelativeEncoder intakePivotEncoder;
+    // private RelativeEncoder intakePivotEncoder;
     // Shuffleboard entry for pivot position
-    private GenericEntry pivotPositionEntry;
+    // private GenericEntry pivotPositionEntry;
     
     // Duplicate TalonFX fields removed - use the canonical fields declared above:
     // intake, flyWheel1, flyWheel2, feeder, indexer
@@ -102,26 +103,26 @@ public class Modules extends SubsystemBase{
 
         // l
 
-        // intakePivotConfig //sparkflex(idk if this works)
-        //     .smartCurrentLimit(20)
-        //     .inverted(false)
-        //     .idleMode(IdleMode.kBrake);
+        intakePivotConfig //sparkflex(idk if this works)
+            .smartCurrentLimit(20)
+            .inverted(false)
+            .idleMode(IdleMode.kBrake);
 
-        // initialize intake pivot encoder (defensive)
-        try {
-            intakePivotEncoder = intakePivot.getEncoder();
-        } catch (Exception e) {
-            intakePivotEncoder = null;
-            System.out.println("Warning: intakePivot encoder not available: " + e.getMessage());
-        }
+        // // initialize intake pivot encoder (defensive)
+        // try {
+        //     intakePivotEncoder = intakePivot.getEncoder();
+        // } catch (Exception e) {
+        //     intakePivotEncoder = null;
+        //     System.out.println("Warning: intakePivot encoder not available: " + e.getMessage());
+        // }
 
-        // Shuffleboard entry
-        try {
-            pivotPositionEntry = Shuffleboard.getTab("Diagnostics").add("Intake Pivot Position", Double.NaN).getEntry();
-        } catch (Exception e) {
-            pivotPositionEntry = null;
-            System.out.println("Warning: could not create Shuffleboard entry: " + e.getMessage());
-        }
+        // // Shuffleboard entry
+        // try {
+        //     pivotPositionEntry = Shuffleboard.getTab("Diagnostics").add("Intake Pivot Position", Double.NaN).getEntry();
+        // } catch (Exception e) {
+        //     pivotPositionEntry = null;
+        //     System.out.println("Warning: could not create Shuffleboard entry: " + e.getMessage());
+        // }
 
         var currentConfigs1 = new CurrentLimitsConfigs();
         currentConfigs1.StatorCurrentLimit = 40; // Limits torque/acceleration
@@ -265,33 +266,33 @@ public class Modules extends SubsystemBase{
         intakePivot.set(0);
     }
 
-    /**
-     * Return the intake pivot position from the SparkFlex encoder.
-     * Returns Double.NaN if the encoder is unavailable or an error occurs.
-     */
-    public double getPivotPosition() {
-        if (intakePivotEncoder == null) {
-            return Double.NaN;
-        }
-        try {
-            return intakePivotEncoder.getPosition();
-        } catch (Exception e) {
-            return Double.NaN;
-        }
-    }
+    // /**
+    //  * Return the intake pivot position from the SparkFlex encoder.
+    //  * Returns Double.NaN if the encoder is unavailable or an error occurs.
+    //  */
+    // public double getPivotPosition() {
+    //     if (intakePivotEncoder == null) {
+    //         return Double.NaN;
+    //     }
+    //     try {
+    //         return intakePivotEncoder.getPosition();
+    //     } catch (Exception e) {
+    //         return Double.NaN;
+    //     }
+    // }
 
-    @Override
-    public void periodic() {
-        // Publish pivot position to Shuffleboard (if created)
-        if (pivotPositionEntry != null) {
-            double pos = getPivotPosition();
-            try {
-                pivotPositionEntry.setDouble(pos);
-            } catch (Exception e) {
-                // Ignore failures to write telemetry
-            }
-        }
-    }
+    // @Override
+    // public void periodic() {
+    //     // Publish pivot position to Shuffleboard (if created)
+    //     if (pivotPositionEntry != null) {
+    //         double pos = getPivotPosition();
+    //         try {
+    //             pivotPositionEntry.setDouble(pos);
+    //         } catch (Exception e) {
+    //             // Ignore failures to write telemetry
+    //         }
+    //     }
+    // }
 
     // public void setLift(double speed) {
     //     lift.set(speed);
