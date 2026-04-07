@@ -47,6 +47,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -153,6 +154,7 @@ public class RobotContainer {
 
 
   public RobotContainer() {
+    configureAutoBindings();
     configureBindings();
   }
 
@@ -165,6 +167,11 @@ public class RobotContainer {
    * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
+
+  private void configureAutoBindings() {
+    NamedCommands.registerCommand("shoot",  Commands.run(() -> modules.setflyWheelD()));
+    
+  }
 
   private void configureBindings() {
     drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
