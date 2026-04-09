@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Middle 1"
+            "pathName": "Middle 1 Flow"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Tested Flow Autos",
   "choreoAuto": false
 }

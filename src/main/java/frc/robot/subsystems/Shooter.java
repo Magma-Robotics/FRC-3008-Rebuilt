@@ -14,16 +14,15 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class Shooter extends SubsystemBase{
     private SparkMax counterRoller;
-    private SparkFlex intakePivot; //, lift;
 
-    private SparkFlexConfig intakePivotConfig; //, liftConfig;
-    private SparkMaxConfig counterRollerConfig;
+    private SparkMaxConfig counterRollerConfig = new SparkMaxConfig();
 
     private final TalonFX flyWheel1, flyWheel2, feeder;
-    private final VelocityVoltage velocityRequestl, velocityRequestd, velocityRequestr, velocityRequestu;
+    private final VelocityVoltage velocityRequestl, velocityRequestd, velocityRequestr, velocityRequestu, velocityRequesta;
 
     private TalonFXConfiguration flyWheel1Config, flyWheel2Config, feederConfig;
 
@@ -34,7 +33,7 @@ public class Shooter extends SubsystemBase{
         flyWheel2 = new TalonFX(0);
         feeder = new TalonFX(21);
 
-        counterRoller = new SparkMax(15, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+        counterRoller = new SparkMax(23, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
 
         flyWheel2Config = new TalonFXConfiguration();
         flyWheel1Config = new TalonFXConfiguration();
@@ -45,6 +44,7 @@ public class Shooter extends SubsystemBase{
          *   L   R         The D pad accordingly
                D                                    */
 
+        velocityRequesta = new VelocityVoltage(83);
         velocityRequestl = new VelocityVoltage(79);
         velocityRequestd = new VelocityVoltage(81);
         velocityRequestr = new VelocityVoltage(82);
@@ -84,7 +84,6 @@ public class Shooter extends SubsystemBase{
         flyWheel2Config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
         counterRoller.configure(counterRollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        intakePivot.configure(intakePivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         
         feeder.getConfigurator().apply(feederConfig);
         feeder.getConfigurator().apply(currentConfigs);
@@ -111,6 +110,17 @@ public class Shooter extends SubsystemBase{
     public void setflyWheelU() {
         flyWheel1.setControl(velocityRequestu);
         flyWheel2.setControl(velocityRequestu);
+    }
+
+    public void autonomousShoot() {
+        flyWheel1.setControl(velocityRequesta);
+        flyWheel2.setControl(velocityRequesta);
+        new WaitCommand(2)
+            .andThen(() -> setFeeder(1));
+            //.andThen(() -> hood positioning);
+        new WaitCommand(5)
+            .andThen(() -> stopFeeding())
+            .andThen(() -> stopflyWheel());
     }
 
     public void setFeeder(double speed) {

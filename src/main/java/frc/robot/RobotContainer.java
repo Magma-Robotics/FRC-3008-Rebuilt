@@ -8,7 +8,7 @@ import frc.robot.Constants.OperatorConstants;
 //import frc.robot.commands.Autos;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-//import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Hood;
 import swervelib.SwerveInputStream;
 
 import java.io.File;
@@ -34,6 +34,7 @@ public class RobotContainer {
                                                                                 "swerve/main"));
   private final Intake intake = new Intake();
   private final Shooter shooter = new Shooter();
+  private final Hood hood = new Hood();
 
   private final CommandXboxController driverXbox =
       new CommandXboxController(0);
@@ -93,7 +94,9 @@ public class RobotContainer {
   }
 
   private void configureAutoBindings() {
-    NamedCommands.registerCommand("shoot",  Commands.run(() -> shooter.setflyWheelD())); 
+    NamedCommands.registerCommand("Shoot",  Commands.run(() -> shooter.autonomousShoot()));
+    NamedCommands.registerCommand("Open the Hopper", Commands.run(() -> intake.autoPivot(0.4)));
+    NamedCommands.registerCommand("Intake", Commands.run(() -> intake.autoIntake(-0.4)));
   }
 
   private void configureBindings() {
@@ -177,6 +180,15 @@ public class RobotContainer {
       .onTrue(Commands.run(() -> intake.setPivot(-1), intake))
       .onFalse(Commands.run(() -> intake.stopPivot(), intake));
 
+    driverXbox2
+      .rightTrigger()
+      .onTrue(Commands.run(() -> hood.setHood(0.3), hood))
+      .onFalse(Commands.run(() -> hood.stopHood(), hood));
+
+    driverXbox2
+      .leftTrigger()
+      .onTrue(Commands.run(() -> hood.setHood(-0.3), hood))
+      .onFalse(Commands.run(() -> hood.stopHood(), hood));
     }
 
   public void setMotorBrake(boolean brake)
@@ -189,7 +201,7 @@ public class RobotContainer {
   }
 
    public Command getPathPlannerAutonomous() {
-    return drivebase.getAutonomousCommand("Draft-Auto-Blue-1");
+    return drivebase.getAutonomousCommand("Auto Middle V2");
   }
 
   public void initForTeleop(){

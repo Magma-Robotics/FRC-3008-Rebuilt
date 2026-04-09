@@ -15,6 +15,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.networktables.GenericEntry;
 
@@ -74,7 +75,7 @@ public class Intake extends SubsystemBase{
 
         intakeConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        
+
         intakePivot.configure(intakePivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         
         intake.getConfigurator().apply(intakeConfig);
@@ -93,12 +94,20 @@ public class Intake extends SubsystemBase{
     
     public void smartIntakeIN(double speed) {
         intake.set(Math.abs(speed));
-        indexer.set(Math.abs(speed));
+        //indexer.set(Math.abs(speed*1.35));
     }
 
     public void smartIntakeOUT(double speed) {
         intake.set(Math.abs(speed));
-        indexer.set(Math.abs(speed));
+        //indexer.set(Math.abs(speed*1.35));
+    }
+
+    public void autoIntake(double speed) {
+        intake.set(speed);
+        indexer.set(speed);
+        new WaitCommand(5)
+            .andThen(() -> stopIntake())
+            .andThen(() -> stopIndexing());
     }
     
     
@@ -132,6 +141,12 @@ public class Intake extends SubsystemBase{
         // }
 
         intakePivot.set(speed);
+    }
+
+    public void autoPivot(double speed) {
+        intakePivot.set(speed);
+        new WaitCommand(1);
+        intakePivot.set(0);
     }
 
     public void stopPivot() {
