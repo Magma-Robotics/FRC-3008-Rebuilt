@@ -106,11 +106,12 @@ public class RobotContainer {
       .a()
       .onTrue(Commands.runOnce(() -> drivebase.zeroGyro()));
 
-    /*driverXbox
+    driverXbox
       .b()
-      .onTrue(Commands.runOnce(() -> drivebase.autoAimMode()));*/
+      .onTrue(Commands.runOnce(() -> drivebase.autoAimMode()));
 
-    /* driverXbox2
+    /* driver
+    Xbox2
       .leftBumper()
       .onTrue(Commands.run(() -> intake.setIntake(Math.abs(0.4)), intake))
       .onFalse(Commands.run(() -> intake.stopIntake(), intake));
@@ -122,30 +123,30 @@ public class RobotContainer {
 
     driverXbox2
       .leftBumper()
-      .onTrue(Commands.run(() -> intake.smartIntakeIN(0.4), intake))
+      .onTrue(Commands.run(() -> intake.smartIntake(0.7), intake))
       .onFalse(Commands.run(() -> intake.stopIntake(), intake));
     
     driverXbox2
-      .rightBumper()
-      .onTrue(Commands.run(() -> intake.smartIntakeOUT(0.4), intake)) //this better work -0.2
+      .leftTrigger()
+      .onTrue(Commands.run(() -> intake.smartIntake(-0.7), intake)) //this better work -0.2
       .onFalse(Commands.run(() -> intake.stopIntake(), intake));
 
-    /* driverXbox2
+     driverXbox2
       .rightTrigger()
       .onTrue(Commands.run(() -> intake.setIndexer(0.75), intake))
       .onFalse(Commands.run(() -> intake.stopIndexing(), intake));
 
-    driverXbox2
-      .leftTrigger()
+    /* driverXbox2
+      .rightTrigger()
       .onTrue(Commands.run(() -> intake.setIndexer(-0.75), intake))
       .onFalse(Commands.run(() -> intake.stopIndexing(), intake)); */
 
     driverXbox2
-      .povLeft()
+      .y()
       .onTrue(Commands.run(() -> shooter.setflyWheelL(), shooter))
       .onFalse(Commands.run(() -> shooter.stopflyWheel(), shooter));
 
-    driverXbox2
+    /* driverXbox2
       .povDown()
       .onTrue(Commands.run(() -> shooter.setflyWheelD(), shooter))
       .onFalse(Commands.run(() -> shooter.stopflyWheel(), shooter));
@@ -158,36 +159,41 @@ public class RobotContainer {
     driverXbox2
       .povUp()
       .onTrue(Commands.run(() -> shooter.setflyWheelU(), shooter))
-      .onFalse(Commands.run(() -> shooter.stopflyWheel(), shooter));
+      .onFalse(Commands.run(() -> shooter.stopflyWheel(), shooter)); */
     
     driverXbox2
       .b()
-      .onTrue(Commands.run(() -> shooter.setFeeder(Math.abs(1)), shooter))
+      .onTrue(Commands.run(() -> shooter.setFeeder(Math.abs(0.5)), shooter))
       .onFalse(Commands.run(() -> shooter.stopFeeding(), shooter));
 
-    driverXbox2
+    /* driverXbox2
       .a()  
-      .onTrue(Commands.run(() -> shooter.setFeederBack(-Math.abs(1)), shooter))
-      .onFalse(Commands.run(() -> shooter.stopFeeding(), shooter));
+      .onTrue(Commands.run(() -> shooter.setFeederBack(-Math.abs(0.5)), shooter))
+      .onFalse(Commands.run(() -> shooter.stopFeeding(), shooter)); */
 
     driverXbox2
-      .x()
+      .rightBumper()  
+      .onTrue(Commands.run(() -> intake.agitatePivot(), intake))
+      .onFalse(Commands.run(() -> intake.setPivot(0), intake));
+
+    driverXbox2
+      .povUp().and(() -> (intake.getPivotPosition() < -0.45))
       .onTrue(Commands.run(() -> intake.setPivot(1), intake))
       .onFalse(Commands.run(() -> intake.stopPivot(), intake));
 
     driverXbox2
-      .y()
+      .povDown().and(() -> (intake.getPivotPosition() > -74.5))
       .onTrue(Commands.run(() -> intake.setPivot(-1), intake))
       .onFalse(Commands.run(() -> intake.stopPivot(), intake));
 
     driverXbox2
-      .rightTrigger()
-      .onTrue(Commands.run(() -> hood.setHood(0.3), hood))
+      .leftStick().and(() -> (hood.getHoodPos() < 2.5))
+      .onTrue(Commands.run(() -> hood.setHoodSpeed(0.25), hood))
       .onFalse(Commands.run(() -> hood.stopHood(), hood));
 
     driverXbox2
-      .leftTrigger()
-      .onTrue(Commands.run(() -> hood.setHood(-0.3), hood))
+      .rightStick().and(() -> (hood.getHoodPos() > 0))
+      .onTrue(Commands.run(() -> hood.setHoodSpeed(-0.15), hood))
       .onFalse(Commands.run(() -> hood.stopHood(), hood));
     }
 
@@ -201,7 +207,7 @@ public class RobotContainer {
   }
 
    public Command getPathPlannerAutonomous() {
-    return drivebase.getAutonomousCommand("Auto Middle V2");
+    return drivebase.getAutonomousCommand("Auto Middle Flow");
   }
 
   public void initForTeleop(){

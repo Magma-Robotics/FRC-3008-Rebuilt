@@ -21,7 +21,7 @@ public class Shooter extends SubsystemBase{
 
     private SparkMaxConfig counterRollerConfig = new SparkMaxConfig();
 
-    private final TalonFX flyWheel1, flyWheel2, feeder;
+    private final TalonFX flyWheel1, feeder; //TODO: put back flywheel2
     private final VelocityVoltage velocityRequestl, velocityRequestd, velocityRequestr, velocityRequestu, velocityRequesta;
 
     private TalonFXConfiguration flyWheel1Config, flyWheel2Config, feederConfig;
@@ -30,7 +30,7 @@ public class Shooter extends SubsystemBase{
     public Shooter() {
         
         flyWheel1 = new TalonFX(1);
-        flyWheel2 = new TalonFX(0);
+        //flyWheel2 = new TalonFX(0);
         feeder = new TalonFX(21);
 
         counterRoller = new SparkMax(23, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
@@ -45,10 +45,10 @@ public class Shooter extends SubsystemBase{
                D                                    */
 
         velocityRequesta = new VelocityVoltage(83);
-        velocityRequestl = new VelocityVoltage(79);
-        velocityRequestd = new VelocityVoltage(81);
-        velocityRequestr = new VelocityVoltage(82);
-        velocityRequestu = new VelocityVoltage(83);
+        velocityRequestl = new VelocityVoltage(70);
+        velocityRequestd = new VelocityVoltage(50);
+        velocityRequestr = new VelocityVoltage(60);
+        velocityRequestu = new VelocityVoltage(70);
 
         var slot0 = flyWheel1Config.Slot0;
         slot0.kP = 0.12;
@@ -89,32 +89,32 @@ public class Shooter extends SubsystemBase{
         feeder.getConfigurator().apply(currentConfigs);
 
         flyWheel1.getConfigurator().apply(flyWheel1Config);
-        flyWheel2.getConfigurator().apply(flyWheel2Config);
+        //flyWheel2.getConfigurator().apply(flyWheel2Config);
     }
 
     public void setflyWheelL() {
         flyWheel1.setControl(velocityRequestl);
-        flyWheel2.setControl(velocityRequestl);
+        //flyWheel2.setControl(velocityRequestl);
     }
 
     public void setflyWheelD() {
         flyWheel1.setControl(velocityRequestd);
-        flyWheel2.setControl(velocityRequestd);
+        //flyWheel2.setControl(velocityRequestd);
     }
 
     public void setflyWheelR() {
         flyWheel1.setControl(velocityRequestr);
-        flyWheel2.setControl(velocityRequestr);
+        //flyWheel2.setControl(velocityRequestr);
     }
 
     public void setflyWheelU() {
         flyWheel1.setControl(velocityRequestu);
-        flyWheel2.setControl(velocityRequestu);
+        //flyWheel2.setControl(velocityRequestu);
     }
 
     public void autonomousShoot() {
         flyWheel1.setControl(velocityRequesta);
-        flyWheel2.setControl(velocityRequesta);
+        //flyWheel2.setControl(velocityRequesta);
         new WaitCommand(2)
             .andThen(() -> setFeeder(1));
             //.andThen(() -> hood positioning);
@@ -125,12 +125,12 @@ public class Shooter extends SubsystemBase{
 
     public void setFeeder(double speed) {
         feeder.set(speed);
-        counterRoller.set(Math.abs(speed));
+        counterRoller.set(Math.abs(speed*1.5));
     }
 
     public void setFeederBack(double speed) {
         feeder.set(speed);
-        counterRoller.set(-Math.abs(speed));
+        counterRoller.set(-Math.abs(speed*1.5));
     }
 
     public void stopFeeding() {
@@ -140,11 +140,11 @@ public class Shooter extends SubsystemBase{
 
     public void stopflyWheel() {
         flyWheel1.set(0);
-        flyWheel2.set(0);
+        //flyWheel2.set(0);
     }
 
     public void setFlywheelZero(double speed) {
         flyWheel1.set(Math.abs(speed));
-        flyWheel2.set(Math.abs(speed));
+        //flyWheel2.set(Math.abs(speed));
     }
 }

@@ -115,6 +115,6 @@ public final class Constants
 
   public static class AutonomyConstants{
     public static final Translation2d BLUE_GOAL_COORDS = new Translation2d(1.8211, 1.5884);
-    public static final Translation2d RED_GOAL_COORDS = new Translation2d(4.7011, 1.5884);
+    public static final Translation2d RED_GOAL_COORDS = new Translation2d(4.211, 0.5884);//4.7011, 1.5884
   }
 }

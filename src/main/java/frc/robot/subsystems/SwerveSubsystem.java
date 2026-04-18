@@ -60,7 +60,7 @@ public class SwerveSubsystem extends SubsystemBase
   private boolean isAutoAimMode;
   private double angleToGoal;
   private double desiredSwerveSpeed;
-  private double autoAimKp=.035;
+  private double autoAimKp=1.9;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -116,24 +116,58 @@ public class SwerveSubsystem extends SubsystemBase
     // double yaw = rawHeading.getRadians();
     double yaw = swerveDrive.getYaw().getRadians();
     LimelightHelpers.SetRobotOrientation("", yaw, 0.0, 0.0, 0.0, 0.0, 0.0);
-    LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("");
+    //LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("");
     //LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("");
+    LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("");
+    //Shift pose by x:-8.3, y by -4.0
+
     if(limelightMeasurement.tagCount > 0){
-      swerveDrive.addVisionMeasurement(limelightMeasurement.pose, limelightMeasurement.timestampSeconds);
+      Pose2d adjustedPose = new Pose2d(limelightMeasurement.pose.getX() - 8.3,
+                                        limelightMeasurement.pose.getY() - 4.0,
+                                        limelightMeasurement.pose.getRotation());
+      swerveDrive.addVisionMeasurement(adjustedPose, limelightMeasurement.timestampSeconds);
     } 
 
+    SmartDashboard.putNumber("Swerve X", swerveDrive.getPose().getX());
+    SmartDashboard.putNumber("Swerve Y", swerveDrive.getPose().getY());
+    SmartDashboard.putNumber("Swerve Yaw", swerveDrive.getYaw().getRadians());
+
+    SmartDashboard.putNumber("Angle to goal", angleToGoal);
     if(isAutoAimMode){
       Pose2d currentLoc = swerveDrive.getPose();
       var alliance = DriverStation.getAlliance();
       Translation2d vecToGoal;
       if(alliance.get() == DriverStation.Alliance.Red){
-        vecToGoal = Constants.AutonomyConstants.RED_GOAL_COORDS.minus(currentLoc.getTranslation());
+        vecToGoal = Constants.AutonomyConstants.RED_GOAL_COORDS.minus(currentLoc.getTranslation());//Find direction to goal
+        //angleToGoal = ((swerveDrive.getYaw().getRadians() + Math.PI) % (2 * Math.PI)) - Math.atan2(vecToGoal.getY(), vecToGoal.getX());//Find difference between robot heading and goal direction
+        angleToGoal = keepWithinRotationRange(swerveDrive.getYaw().getRadians() + Math.PI);
+        angleToGoal = keepWithinRotationRange(angleToGoal - Math.atan2(vecToGoal.getY(), vecToGoal.getX()));//Find difference between robot heading and goal direction
       }
       else{
         vecToGoal = Constants.AutonomyConstants.BLUE_GOAL_COORDS.minus(currentLoc.getTranslation());
       }
-      angleToGoal = swerveDrive.getYaw().getRadians()- Math.atan2(vecToGoal.getY(), vecToGoal.getX());
+      
+      SmartDashboard.putNumber("Vec2goalX", vecToGoal.getX());
+      SmartDashboard.putNumber("Vec2goalY", vecToGoal.getY());
+      SmartDashboard.putNumber("Atan result", Math.atan2(vecToGoal.getY(), vecToGoal.getX()));
+      SmartDashboard.putNumber("Angle to goal", angleToGoal);
+      //add rotation commands
+      // if(Math.abs(angleToGoal) > 0.1){
+      //   ChassisSpeeds rotateSpeeds = new ChassisSpeeds(0.0, 0.0, angleToGoal * 1.0);
+      //   //swerveDrive.driveFieldOriented(rotateSpeeds);
+      //   swerveDrive.drive(rotateSpeeds);
+      // }
     }
+  }
+
+  private double keepWithinRotationRange(double inRotation){
+    if(inRotation > Math.PI){
+      inRotation = inRotation - 2 * Math.PI;
+    }
+    else if(inRotation < -Math.PI){
+      inRotation = inRotation + 2 * Math.PI;
+    }
+    return inRotation;
   }
 
   @Override
@@ -474,12 +508,19 @@ public class SwerveSubsystem extends SubsystemBase
   public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity)
   {
     return run(() -> {
-      //AUTO MODIFIED!!!
+      // //AUTO MODIFIED!!!
       ChassisSpeeds modifiedSpeeds = velocity.get();
       if(isAutoAimMode && Math.abs(modifiedSpeeds.omegaRadiansPerSecond) < 0.1){ //Check if we are in auto aim mode and driver does not want control
         //Angle PID
-        desiredSwerveSpeed= angleToGoal * autoAimKp;//.035
-        modifiedSpeeds.omegaRadiansPerSecond = desiredSwerveSpeed;
+        if(Math.abs(angleToGoal) > 0.15){
+          if(angleToGoal >= 0){
+            desiredSwerveSpeed = -(Math.pow(angleToGoal + 0.5, 2)) * autoAimKp;//.035
+          }
+          else{
+            desiredSwerveSpeed = Math.pow(angleToGoal - 0.5, 2) * autoAimKp;//.035
+          }
+          modifiedSpeeds.omegaRadiansPerSecond = desiredSwerveSpeed;
+        }
         // if works acualy apply movment to chassis.
       }
       else{

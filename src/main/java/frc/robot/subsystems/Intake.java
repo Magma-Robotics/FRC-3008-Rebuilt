@@ -92,15 +92,15 @@ public class Intake extends SubsystemBase{
         intake.set(0);
     }
     
-    public void smartIntakeIN(double speed) {
-        intake.set(Math.abs(speed));
+    public void smartIntake(double speed) {
+        intake.set(speed);
         //indexer.set(Math.abs(speed*1.35));
     }
 
-    public void smartIntakeOUT(double speed) {
+    /* public void smartIntakeOUT(double speed) {
         intake.set(Math.abs(speed));
         //indexer.set(Math.abs(speed*1.35));
-    }
+    } */
 
     public void autoIntake(double speed) {
         intake.set(speed);
@@ -139,7 +139,7 @@ public class Intake extends SubsystemBase{
         //         return;
         //     }
         // }
-
+        
         intakePivot.set(speed);
     }
 
@@ -150,6 +150,14 @@ public class Intake extends SubsystemBase{
     }
 
     public void stopPivot() {
+        intakePivot.set(0);
+    }
+
+    public void agitatePivot() {
+        intakePivot.set(0.7);
+        new WaitCommand(2);
+        intakePivot.set(-0.7);
+        new WaitCommand(2);
         intakePivot.set(0);
     }
 
