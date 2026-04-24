@@ -16,21 +16,29 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class Shooter extends SubsystemBase{
     private SparkMax counterRoller;
 
     private SparkMaxConfig counterRollerConfig = new SparkMaxConfig();
 
-    private final TalonFX flyWheel1, feeder; //TODO: put back flywheel2
+    private final TalonFX flyWheel1, flyWheel2, feeder;
     private final VelocityVoltage velocityRequestl, velocityRequestd, velocityRequestr, velocityRequestu, velocityRequesta;
 
     private TalonFXConfiguration flyWheel1Config, flyWheel2Config, feederConfig;
 
+    private double autoPower = 0.0;
+
+    private double MIN_DISTANCE_TO_GOAL = 1.62; // meters, 5.31 feet
+    private double MAX_DISTANCE_TO_GOAL = 4.11; // meters, 18.81
+    private double FLYWHEEL_SPEED_MIN = 53;
+    private double FLYWHEEL_SPEED_MAX = 63;
 
     public Shooter() {
         
-        flyWheel1 = new TalonFX(1);
-        //flyWheel2 = new TalonFX(0);
+        flyWheel1 = new TalonFX(54);
+        flyWheel2 = new TalonFX(55);
         feeder = new TalonFX(21);
 
         counterRoller = new SparkMax(23, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
@@ -45,7 +53,7 @@ public class Shooter extends SubsystemBase{
                D                                    */
 
         velocityRequesta = new VelocityVoltage(83);
-        velocityRequestl = new VelocityVoltage(70);
+        velocityRequestl = new VelocityVoltage(63);
         velocityRequestd = new VelocityVoltage(50);
         velocityRequestr = new VelocityVoltage(60);
         velocityRequestu = new VelocityVoltage(70);
@@ -89,32 +97,37 @@ public class Shooter extends SubsystemBase{
         feeder.getConfigurator().apply(currentConfigs);
 
         flyWheel1.getConfigurator().apply(flyWheel1Config);
-        //flyWheel2.getConfigurator().apply(flyWheel2Config);
+        flyWheel2.getConfigurator().apply(flyWheel2Config);
     }
 
     public void setflyWheelL() {
         flyWheel1.setControl(velocityRequestl);
-        //flyWheel2.setControl(velocityRequestl);
+        flyWheel2.setControl(velocityRequestl);
     }
 
     public void setflyWheelD() {
         flyWheel1.setControl(velocityRequestd);
-        //flyWheel2.setControl(velocityRequestd);
+        flyWheel2.setControl(velocityRequestd);
     }
 
     public void setflyWheelR() {
         flyWheel1.setControl(velocityRequestr);
-        //flyWheel2.setControl(velocityRequestr);
+        flyWheel2.setControl(velocityRequestr);
     }
 
     public void setflyWheelU() {
         flyWheel1.setControl(velocityRequestu);
-        //flyWheel2.setControl(velocityRequestu);
+        flyWheel2.setControl(velocityRequestu);
+    }
+
+    public void autoPowerShoot() {
+        flyWheel1.setControl(new VelocityVoltage(autoPower));
+        flyWheel2.setControl(new VelocityVoltage(autoPower));
     }
 
     public void autonomousShoot() {
         flyWheel1.setControl(velocityRequesta);
-        //flyWheel2.setControl(velocityRequesta);
+        flyWheel2.setControl(velocityRequesta);
         new WaitCommand(2)
             .andThen(() -> setFeeder(1));
             //.andThen(() -> hood positioning);
@@ -140,11 +153,18 @@ public class Shooter extends SubsystemBase{
 
     public void stopflyWheel() {
         flyWheel1.set(0);
-        //flyWheel2.set(0);
+        flyWheel2.set(0);
     }
 
     public void setFlywheelZero(double speed) {
         flyWheel1.set(Math.abs(speed));
-        //flyWheel2.set(Math.abs(speed));
+        flyWheel2.set(Math.abs(speed));
+    }
+
+    @Override
+    public void periodic() {
+        double DistanceToGoal = SmartDashboard.getNumber("DistanceToGoal", 0.0);
+        autoPower = FLYWHEEL_SPEED_MIN + ((DistanceToGoal - MIN_DISTANCE_TO_GOAL)/(MAX_DISTANCE_TO_GOAL - MIN_DISTANCE_TO_GOAL)) * (FLYWHEEL_SPEED_MAX - FLYWHEEL_SPEED_MIN);
+        SmartDashboard.putNumber("FlywheelTarget", autoPower);
     }
 }

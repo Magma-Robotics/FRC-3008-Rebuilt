@@ -123,7 +123,7 @@ public class RobotContainer {
 
     driverXbox2
       .leftBumper()
-      .onTrue(Commands.run(() -> intake.smartIntake(0.7), intake))
+      .onTrue(Commands.run(() -> intake.smartIntake(0.4), intake))
       .onFalse(Commands.run(() -> intake.stopIntake(), intake));
     
     driverXbox2
@@ -143,7 +143,14 @@ public class RobotContainer {
 
     driverXbox2
       .y()
-      .onTrue(Commands.run(() -> shooter.setflyWheelL(), shooter))
+      .onTrue(Commands.run(() -> shooter.autoPowerShoot(), shooter))
+      .onTrue(Commands.runOnce(() -> hood.hoodAutoEnable(), hood))
+      .onFalse(Commands.run(() -> shooter.stopflyWheel(), shooter))
+      .onFalse(Commands.runOnce(() -> hood.hoodAutoRetract(), hood));
+
+    driverXbox2
+      .a()
+      .onTrue(Commands.run(() -> shooter.autoPowerShoot(), shooter))
       .onFalse(Commands.run(() -> shooter.stopflyWheel(), shooter));
 
     /* driverXbox2
@@ -188,14 +195,28 @@ public class RobotContainer {
 
     driverXbox2
       .leftStick().and(() -> (hood.getHoodPos() < 2.5))
-      .onTrue(Commands.run(() -> hood.setHoodSpeed(0.25), hood))
-      .onFalse(Commands.run(() -> hood.stopHood(), hood));
+      .onTrue(Commands.runOnce(() -> hood.hoodAutoDisable(), hood))
+      .onTrue(Commands.run(() -> hood.setHoodSpeed(1), hood))
+      .onFalse(Commands.runOnce(() -> hood.stopHood(), hood));
 
     driverXbox2
       .rightStick().and(() -> (hood.getHoodPos() > 0))
+      .onTrue(Commands.runOnce(() -> hood.hoodAutoDisable(), hood))
       .onTrue(Commands.run(() -> hood.setHoodSpeed(-0.15), hood))
-      .onFalse(Commands.run(() -> hood.stopHood(), hood));
-    }
+      .onFalse(Commands.runOnce(() -> hood.stopHood(), hood));
+
+      //   driverXbox2
+      //   .leftStick().and(() -> (hood.getHoodPos() < 2.5))
+      //   .onTrue(Commands.run(() -> hood.hoodAutoDisable(), hood))
+      //   .onTrue(Commands.run(() -> hood.setHoodSpeed(1), hood))
+      //   .onFalse(Commands.run(() -> hood.stopHood(), hood));
+
+      // driverXbox2
+      //   .rightStick().and(() -> (hood.getHoodPos() > 0))
+      //   .onTrue(Commands.run(() -> hood.hoodAutoDisable(), hood))
+      //   .onTrue(Commands.run(() -> hood.setHoodSpeed(-0.15), hood))
+      //   .onFalse(Commands.run(() -> hood.stopHood(), hood));
+  }
 
   public void setMotorBrake(boolean brake)
   {
