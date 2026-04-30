@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 3.0169044222539223,
-        "y": 7.0820542082738935
+        "x": 7.739514978601996,
+        "y": 6.849158345221112
       },
       "prevControl": {
-        "x": 3.216904422253921,
-        "y": 7.232054208273895
+        "x": 7.752453637660485,
+        "y": 7.690171184022825
       },
       "nextControl": null,
       "isLocked": false,
@@ -41,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -62.46392689184283
+    "velocity": 0.0,
+    "rotation": -90.0
   },
   "reversed": false,
-  "folder": "Auto Left Trench V2",
+  "folder": "Blue Auto Left Trench V3",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

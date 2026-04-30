@@ -145,8 +145,16 @@ public class Intake extends SubsystemBase{
 
     public void autoPivot(double speed) {
         intakePivot.set(speed);
-        new WaitCommand(1);
+        indexer.set(1);
+        new WaitCommand(2);
         intakePivot.set(0);
+    }
+
+    public void autoPivotRetract(double speed) {
+        intakePivot.set(speed);
+        new WaitCommand(-1);
+        intakePivot.set(0);
+        indexer.set(1);
     }
 
     public void stopPivot() {
@@ -159,6 +167,10 @@ public class Intake extends SubsystemBase{
         intakePivot.set(-0.7);
         new WaitCommand(2);
         intakePivot.set(0);
+    }
+
+    public void autoPivot() {
+        intakePivot.set(0.5);
     }
 
     /**

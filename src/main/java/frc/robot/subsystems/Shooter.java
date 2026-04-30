@@ -33,7 +33,7 @@ public class Shooter extends SubsystemBase{
     private double MIN_DISTANCE_TO_GOAL = 1.62; // meters, 5.31 feet
     private double MAX_DISTANCE_TO_GOAL = 4.11; // meters, 18.81
     private double FLYWHEEL_SPEED_MIN = 53;
-    private double FLYWHEEL_SPEED_MAX = 63;
+    private double FLYWHEEL_SPEED_MAX = 61;
 
     public Shooter() {
         
@@ -125,15 +125,18 @@ public class Shooter extends SubsystemBase{
         flyWheel2.setControl(new VelocityVoltage(autoPower));
     }
 
-    public void autonomousShoot() {
-        flyWheel1.setControl(velocityRequesta);
-        flyWheel2.setControl(velocityRequesta);
-        new WaitCommand(2)
+    public void autonomousShoot1() {
+        flyWheel1.set(autoPower);
+        flyWheel2.set(autoPower);
+        new WaitCommand(1)
             .andThen(() -> setFeeder(1));
             //.andThen(() -> hood positioning);
-        new WaitCommand(5)
-            .andThen(() -> stopFeeding())
-            .andThen(() -> stopflyWheel());
+    }
+
+    public void autoNoFly() {
+        flyWheel1.set(0);
+        flyWheel2.set(0);
+        feeder.set(0);
     }
 
     public void setFeeder(double speed) {

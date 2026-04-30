@@ -1,0 +1,115 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.752453637660485,
+        "y": 6.862097004279601
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.788249028187774,
+        "y": 5.850885513604504
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.752453637660485,
+        "y": 4.85660485021398
+      },
+      "prevControl": {
+        "x": 8.098459879829422,
+        "y": 5.717545007205487
+      },
+      "nextControl": {
+        "x": 7.6592274478205,
+        "y": 4.624637444038201
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.092582025677602,
+        "y": 5.477660485021398
+      },
+      "prevControl": {
+        "x": 7.278737484443635,
+        "y": 4.68906922845949
+      },
+      "nextControl": {
+        "x": 6.834580102276022,
+        "y": 6.570607542922907
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.600912981455064,
+        "y": 6.642139800285308
+      },
+      "prevControl": {
+        "x": 6.7533408982461705,
+        "y": 6.44144264671051
+      },
+      "nextControl": {
+        "x": 6.2854091709965925,
+        "y": 7.057553971350802
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.941041369472182,
+        "y": 7.379643366619116
+      },
+      "prevControl": {
+        "x": 6.593620395758179,
+        "y": 6.566496007396368
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.8530954879328374,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 1.8478488982161352,
+      "rotationDegrees": 109.63765840985766
+    },
+    {
+      "waypointRelativePos": 2.673662119622226,
+      "rotationDegrees": 46.24930547213147
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Blue Auto Left Trench V3",
+  "idealStartingState": {
+    "velocity": 0.0,
+    "rotation": -90.0
+  },
+  "useDefaultConstraints": true
+}

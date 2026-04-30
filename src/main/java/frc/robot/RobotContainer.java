@@ -94,9 +94,13 @@ public class RobotContainer {
   }
 
   private void configureAutoBindings() {
-    NamedCommands.registerCommand("Shoot",  Commands.run(() -> shooter.autonomousShoot()));
+    NamedCommands.registerCommand("Shoot",  Commands.run(() -> shooter.autonomousShoot1()));
+    NamedCommands.registerCommand("No Shoot",  Commands.run(() -> shooter.autoNoFly()));
     NamedCommands.registerCommand("Open the Hopper", Commands.run(() -> intake.autoPivot(0.4)));
+    NamedCommands.registerCommand("Hopper Shrink", Commands.run(() -> intake.autoPivotRetract(0.4)));
     NamedCommands.registerCommand("Intake", Commands.run(() -> intake.autoIntake(-0.4)));
+    NamedCommands.registerCommand("No Intake", Commands.run(() -> intake.autoIntake(0)));
+    NamedCommands.registerCommand("No Intake", Commands.run(() -> intake.autoIntake(0)));
   }
 
   private void configureBindings() {
@@ -228,7 +232,7 @@ public class RobotContainer {
   }
 
    public Command getPathPlannerAutonomous() {
-    return drivebase.getAutonomousCommand("Auto Middle Flow");
+    return drivebase.getAutonomousCommand("AB Left Trench");
   }
 
   public void initForTeleop(){

@@ -3,8 +3,8 @@
   "robotLength": 0.838,
   "holonomicMode": true,
   "pathFolders": [
-    "Auto Middle V2",
-    "Auto Left Trench V2"
+    "Blue Auto Left Trench V3",
+    "Blue Auto Middle V3"
   ],
   "autoFolders": [
     "Tested Flow Autos"
